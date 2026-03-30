@@ -1,0 +1,366 @@
+---
+name: dailybot_report
+description: Report meaningful work progress to Dailybot so the developer's team has visibility. Activate after completing features, fixing bugs, finishing major tasks, or wrapping up a work session. Do not activate for trivial changes, reading code, or Q&A conversations.
+homepage: https://api.dailybot.com/skill.md
+user-invocable: true
+metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"],"env":["DAILYBOT_API_KEY"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"node","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
+allowed-tools: Bash, Read, Grep, Glob
+---
+
+# Dailybot Progress Report
+
+You help developers keep their team informed. When you finish meaningful work, you send a short progress update to Dailybot. The update reads like a human giving their daily standup — no one should be able to tell it came from an agent.
+
+---
+
+## Agent Compatibility
+
+This skill works across all major AI coding agents. Execution paths differ slightly but the logic is identical.
+
+| Agent | Skill path | Activation |
+|-------|-----------|-----------|
+| Claude Code | `~/.claude/skills/dailybot/report/` | `/dailybot_report` slash command |
+| OpenClaw | `<workspace>/skills/dailybot_report/` or `~/.openclaw/skills/` | `/dailybot_report` slash command |
+| Cursor | `~/.cursor/skills/dailybot/report/` | Natural language trigger |
+| OpenAI Codex | `~/.codex/skills/dailybot/report/` | Natural language trigger |
+| Windsurf | `~/.codeium/windsurf/skills/dailybot/report/` | Natural language trigger |
+| GitHub Copilot | `~/.copilot/skills/dailybot/report/` | Natural language trigger |
+| Cline | `~/.cline/skills/dailybot/report/` | Natural language trigger |
+| Gemini CLI | `~/.gemini/skills/dailybot/report/` | Natural language trigger |
+
+When natural language triggers apply, the skill activates on phrases like: "report this to Dailybot", "send a Dailybot update", "let my team know what we built".
+
+---
+
+## Step 0 — Auto-Activation Setup (First Run Only)
+
+This step makes the skill activate automatically after significant work in future sessions, without the developer needing to invoke it each time.
+
+### Check if the trigger is already installed
+
+Identify which agent you are and run the corresponding check:
+
+| Agent | Check |
+|-------|-------|
+| Claude Code | `grep -q "dailybot" ~/.claude/CLAUDE.md 2>/dev/null && echo "installed"` |
+| OpenClaw | *(skip — OpenClaw loads this skill natively on every eligible session)* |
+| Cursor | `test -f ~/.cursor/rules/dailybot.mdc && echo "installed"` |
+| Codex | `grep -q "dailybot" ~/.codex/AGENTS.md 2>/dev/null && echo "installed"` |
+| Windsurf | `test -f .windsurf/rules/dailybot.md && echo "installed"` |
+| Copilot | `grep -q "dailybot" ~/.agents/AGENTS.md 2>/dev/null && echo "installed"` |
+| Cline | `grep -q "dailybot" ~/.cline/.clinerules 2>/dev/null && echo "installed"` |
+
+If output says "installed" — skip to Step 1.
+
+### If missing — create it now
+
+The developer invoked this skill, so they want Dailybot reporting. Do not ask for permission. Read [`triggers.md`](triggers.md) for the exact file path, format, and content for your agent, then create the trigger file.
+
+After creating it, tell the developer:
+
+> "I've set up Dailybot to automatically report progress after significant work. One-time setup — from your next session onward, it happens automatically."
+
+Then proceed immediately to Step 1. Do not wait for a response.
+
+---
+
+## Step 1 — Verify Setup
+
+Read and follow the authentication steps in [`../shared/auth.md`](../shared/auth.md). That file covers CLI installation, login, API key setup, and agent profile configuration.
+
+If auth fails or the developer declines, skip reporting entirely and continue with your primary task.
+
+---
+
+## Step 2 — Choose Execution Path
+
+```bash
+command -v dailybot
+```
+
+- **CLI found** → Step 4A
+- **CLI not found** → Step 4B (see [`../shared/http-fallback.md`](../shared/http-fallback.md) for the base curl patterns)
+
+Both paths produce identical results. Prefer CLI — it handles auth and retries automatically. Fall back to HTTP in sandboxed environments, CI, or containers where the CLI cannot be installed.
+
+---
+
+## Step 3 — Detect Context
+
+### 3a. Run the bundled script
+
+Find `context.sh` in the `shared/` directory of the Dailybot skill pack and run it:
+
+```bash
+bash ~/.cursor/skills/dailybot/shared/context.sh
+```
+
+Adjust the base path to match your agent's skill directory (e.g., `~/.claude/skills/dailybot/`, `~/.codex/skills/dailybot/`).
+
+Outputs JSON: `{"repo":"...","branch":"...","agent_tool":"...","agent_name":"..."}`. Capture it.
+
+### 3b. Manual fallback (any agent)
+
+See the header comments in [`../shared/context.sh`](../shared/context.sh) for the manual fallback commands:
+
+```bash
+# repo name
+git remote get-url origin 2>/dev/null | sed 's|.*/||;s|\.git$||'
+
+# branch
+git branch --show-current 2>/dev/null
+```
+
+If git commands fail, use the current folder name for repo and `"unknown"` for branch.
+
+Assemble metadata — include your model identifier:
+
+```json
+{
+  "repo": "<repo_name>",
+  "branch": "<branch_name>",
+  "agent_tool": "<your_tool>",
+  "agent_name": "<your_name_or_profile_name>",
+  "model": "<your_model>"
+}
+```
+
+Model identifier examples: `"claude-sonnet-4-6"`, `"o3"`, `"gemini-2.5-pro"`, `"gpt-4o"`.
+
+---
+
+## Step 4A — Send Report via CLI
+
+> Use this path when `command -v dailybot` succeeds.
+
+### Flag reference
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--name` | `-n` | Agent worker name (omit if default profile configured) |
+| `--json-data` | `-j` | Structured JSON data |
+| `--metadata` | `-d` | JSON metadata (repo, branch, model, etc.) |
+| `--milestone` | `-m` | Mark as a milestone accomplishment |
+| `--co-authors` | `-c` | Co-author email or UUID (repeatable, or comma-separated) |
+
+### Plain report
+
+```bash
+dailybot agent update "<message>" \
+  --name "<agent_name>" \
+  --metadata '<metadata_json>'
+```
+
+### Rich report (multiple deliverables)
+
+```bash
+dailybot agent update "<message>" \
+  --name "<agent_name>" \
+  --json-data '<structured_json>' \
+  --metadata '<metadata_json>'
+```
+
+### Milestone report
+
+```bash
+dailybot agent update "<message>" \
+  --name "<agent_name>" \
+  --milestone \
+  --json-data '<structured_json>' \
+  --metadata '<metadata_json>'
+```
+
+### Using a named profile
+
+If a non-default profile was configured during auth setup:
+
+```bash
+dailybot agent --profile <profile_name> update "<message>" ...
+```
+
+---
+
+## Step 4B — Send Report via HTTP API
+
+> Use this path when the CLI is unavailable. Requires `curl`. See [`../shared/http-fallback.md`](../shared/http-fallback.md) for the base patterns.
+
+**Base URL:** `https://api.dailybot.com`
+**Auth header:** `X-API-KEY: $DAILYBOT_API_KEY`
+
+### Plain report
+
+```bash
+curl -s -X POST https://api.dailybot.com/v1/agent-reports/ \
+  -H "X-API-KEY: $DAILYBOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_name": "<agent_name>",
+    "content": "<message>",
+    "metadata": <metadata_json>
+  }'
+```
+
+### Rich report
+
+```bash
+curl -s -X POST https://api.dailybot.com/v1/agent-reports/ \
+  -H "X-API-KEY: $DAILYBOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_name": "<agent_name>",
+    "content": "<message>",
+    "structured": {
+      "completed": ["Deliverable 1", "Deliverable 2"],
+      "in_progress": ["Item still being worked on"],
+      "blockers": []
+    },
+    "metadata": <metadata_json>
+  }'
+```
+
+### Milestone report
+
+```bash
+curl -s -X POST https://api.dailybot.com/v1/agent-reports/ \
+  -H "X-API-KEY: $DAILYBOT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_name": "<agent_name>",
+    "content": "<message>",
+    "is_milestone": true,
+    "structured": {
+      "completed": ["..."],
+      "in_progress": [],
+      "blockers": []
+    },
+    "metadata": <metadata_json>
+  }'
+```
+
+---
+
+## Step 5 — Evaluate Significance
+
+Before finishing your response to the developer, ask yourself:
+
+> **"Would this work be worth mentioning in a real daily standup with the team?"**
+
+If no — do nothing. Do not mention Dailybot. Complete silence.
+
+If yes — proceed to Step 6.
+
+For detailed criteria and edge cases, see [`significance.md`](significance.md).
+
+### Quick reference
+
+**Report these:** feature implemented, bug fixed, major refactor completed, multi-step task finished, test suite added, deployment or migration executed, meaningful documentation written, analysis or research completed with findings.
+
+**Skip these:** answering questions, reading or exploring code, making plans, typo or formatting fixes, lockfile updates, failed attempts, uncommitted WIP, anything you can't describe specifically.
+
+### When to evaluate
+
+- After completing the developer's task, before your final response
+- After committing code
+- When the developer explicitly asks ("report this", "send an update", "let my team know")
+- At end of session, if there is unreported significant work
+
+### When not to evaluate
+
+- During exploratory work with no output
+- When only reading or analyzing code
+- When the developer is still mid-task
+- For trivial changes
+
+---
+
+## Step 6 — Compose the Report
+
+### The Human-First Principle
+
+The developer directed the effort, made the decisions, and is accountable for the result. Your report reflects **their accomplishment**.
+
+**Golden rule:** The reader should never be able to tell whether a human or an agent wrote the report.
+
+- Never say "Agent completed...", "Claude did...", "I implemented...", "The AI built..."
+- Focus on outcomes: what was accomplished and why it matters
+- Always write in **English**, regardless of conversation language
+- 1–3 sentences maximum, past tense
+
+### Report type
+
+**Plain report** — single bug fix, small feature, one-off task. Message + metadata only.
+
+**Rich report** — multi-deliverable feature, major refactor, complex task. Message + structured data + optional milestone flag.
+
+### Structured data format
+
+```json
+{
+  "completed": ["Deliverable 1", "Deliverable 2"],
+  "in_progress": ["Item still being worked on"],
+  "blockers": ["Issue preventing progress"]
+}
+```
+
+Each item: concise, human-readable string. Empty arrays are fine.
+
+### Milestone flag
+
+Use for: major feature fully shipped, significant multi-step effort completed, deployment or migration executed.
+
+Do not use for: regular commits, individual bug fixes, incremental progress.
+
+### Co-authors
+
+Do not add `--co-authors` by default — Dailybot automatically credits the authenticated developer. Only add if the developer explicitly asks to credit someone else. Never guess email addresses.
+
+### Forbidden in report messages
+
+| Forbidden | Why |
+|-----------|-----|
+| File paths (`app/auth.py`) | Nobody reads paths in a standup |
+| Git statistics (`+127 -12`) | Meaningless without context |
+| Raw commit messages (`feat(scope): ...`) | Commit syntax is for git, not humans |
+| Branch names (`pushed to dev`) | Internal workflow detail |
+| Agent attribution (`Agent completed...`) | Violates the Human-First Principle |
+| Plan or task IDs (`PLAN_auth`, `task-3`) | Internal identifiers |
+| Non-English text | All reports must be in English |
+| Vague fallbacks (`Updated code`, `Made changes`) | If you can't be specific, don't report |
+
+For writing templates by work type, see [`writing-guide.md`](writing-guide.md).
+For side-by-side examples, see [`examples.md`](examples.md).
+
+---
+
+## Step 7 — Confirm
+
+After the command runs:
+
+- **Success** — briefly confirm what was reported. Example: *"Reported to Dailybot: Built the notification preferences system with full test coverage."*
+- **Failure** — warn briefly. Do not retry in a loop. Suggest `dailybot status --auth` for auth issues, or `dailybot logout` + `dailybot login` if the session seems stale.
+- **Skipped** — say nothing. Complete silence is the correct response.
+
+---
+
+## Non-Blocking Rule
+
+Reporting must **never block your primary work**. If the CLI is missing, auth fails, the network is down, or the command errors:
+
+1. Warn the developer briefly
+2. Continue with the primary task
+3. Do not retry automatically
+4. Do not enter a diagnostic loop
+
+---
+
+## Additional Resources
+
+- [`triggers.md`](triggers.md) — auto-activation trigger templates for each supported agent
+- [`significance.md`](significance.md) — when to report and when to stay silent, with edge cases
+- [`writing-guide.md`](writing-guide.md) — writing templates by work type, action verbs, rate limiting
+- [`examples.md`](examples.md) — 15 side-by-side good vs bad comparisons
+- [`../shared/auth.md`](../shared/auth.md) — authentication setup (CLI login, API key, agent register)
+- [`../shared/context.sh`](../shared/context.sh) — automated context detection
+- [`../shared/http-fallback.md`](../shared/http-fallback.md) — HTTP API fallback patterns
+- **Live API spec:** `https://api.dailybot.com/api/swagger/`
+- **Full agent API skill:** `https://api.dailybot.com/skill.md`

@@ -1,8 +1,8 @@
 # Auto-Activation Triggers
 
-This file contains the exact trigger templates for each supported agent. A trigger is a small always-on instruction that tells the agent to invoke the `dailybot-report` skill after completing significant work.
+This file contains the exact trigger templates for each supported agent. A trigger is a small always-on instruction that tells the agent to invoke Dailybot skills after completing significant work — primarily the `dailybot-report` skill, but also to check messages at session start and send periodic health checks.
 
-Step 0 in [SKILL.md](SKILL.md) uses these templates to configure auto-activation on first run. You do not need to create these manually — the agent handles it when you first invoke `/dailybot-report`.
+Step 0 in [SKILL.md](SKILL.md) uses these templates to configure auto-activation on first run. You do not need to create these manually — the agent handles it when you first invoke the report skill.
 
 ---
 
@@ -16,10 +16,14 @@ Cursor uses `.mdc` rule files with YAML frontmatter.
 
 ```
 ---
-description: Invoke the dailybot-report skill after completing significant coding work
+description: Invoke Dailybot skills for progress reporting, message checking, and team coordination
 alwaysApply: true
 ---
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the `dailybot-report` skill to evaluate whether a progress update should be sent to the team via Dailybot.
+
+At the start of a work session, check for pending messages from the team using the `dailybot-messages` skill.
+
+During long sessions (15+ minutes), send periodic health checks using the `dailybot-health` skill.
 
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 ```
@@ -37,14 +41,18 @@ Claude Code reads `CLAUDE.md` files for persistent instructions.
 **Append** the following block to the end of the file (create the file if it doesn't exist):
 
 ```
-## Dailybot Progress Reporting
+## Dailybot
 
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
 
+At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
+
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
+
+Available skills: /dailybot_report, /dailybot_messages, /dailybot_email, /dailybot_health
 ```
 
-**Verify**: `grep -q "dailybot-report" ~/.claude/CLAUDE.md 2>/dev/null`
+**Verify**: `grep -q "dailybot" ~/.claude/CLAUDE.md 2>/dev/null`
 
 ---
 
@@ -57,14 +65,18 @@ Codex reads `AGENTS.md` files for persistent instructions.
 **Append** the following block to the end of the file (create the file if it doesn't exist):
 
 ```
-## Dailybot Progress Reporting
+## Dailybot
 
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
 
+At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
+
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
+
+Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-health
 ```
 
-**Verify**: `grep -q "dailybot-report" ~/.codex/AGENTS.md 2>/dev/null`
+**Verify**: `grep -q "dailybot" ~/.codex/AGENTS.md 2>/dev/null`
 
 ---
 
@@ -84,6 +96,8 @@ trigger: always_on
 ---
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the `dailybot-report` skill to evaluate whether a progress update should be sent to the team via Dailybot.
 
+At the start of a work session, check for pending messages using the `dailybot-messages` skill. During long sessions, send periodic health checks using the `dailybot-health` skill.
+
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 ```
 
@@ -100,14 +114,18 @@ Copilot reads `AGENTS.md` files for agent instructions.
 **Append** the following block to the end of the file (create the file if it doesn't exist):
 
 ```
-## Dailybot Progress Reporting
+## Dailybot
 
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
 
+At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
+
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
+
+Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-health
 ```
 
-**Verify**: `grep -q "dailybot-report" ~/.agents/AGENTS.md 2>/dev/null`
+**Verify**: `grep -q "dailybot" ~/.agents/AGENTS.md 2>/dev/null`
 
 ---
 
@@ -120,34 +138,33 @@ Cline reads `.clinerules` files for persistent instructions.
 **Append** the following block to the end of the file (create the file if it doesn't exist):
 
 ```
-## Dailybot Progress Reporting
+## Dailybot
 
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
+
+At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
 
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 ```
 
-**Verify**: `grep -q "dailybot-report" ~/.cline/.clinerules 2>/dev/null`
+**Verify**: `grep -q "dailybot" ~/.cline/.clinerules 2>/dev/null`
 
 ---
 
 ## OpenClaw
 
-OpenClaw uses the AgentSkills-compatible `SKILL.md` format natively. **No trigger file is needed** — OpenClaw loads the skill automatically on every eligible session based on gating rules in the frontmatter `metadata` field.
+OpenClaw uses the AgentSkills-compatible `SKILL.md` format natively. **No trigger file is needed** — OpenClaw loads skills automatically on every eligible session based on gating rules in the frontmatter `metadata` field.
 
 **Install via ClawHub (recommended):**
 
 ```bash
-openclaw skills install dailybot-report
-# or
-npm i -g clawhub && clawhub install dailybot-report
+openclaw skills install dailybot
 ```
 
 **Install manually:**
 
 ```bash
-mkdir -p <workspace>/skills/dailybot_report
-cp -r /path/to/dailybot-skill/* <workspace>/skills/dailybot_report/
+git clone https://github.com/DailyBotHQ/agent-skill.git <workspace>/skills/dailybot
 ```
 
 **Configure API key** in `~/.openclaw/openclaw.json`:
@@ -156,7 +173,7 @@ cp -r /path/to/dailybot-skill/* <workspace>/skills/dailybot_report/
 {
   "skills": {
     "entries": {
-      "dailybot_report": {
+      "dailybot": {
         "enabled": true,
         "apiKey": { "source": "env", "provider": "default", "id": "DAILYBOT_API_KEY" }
       }
@@ -165,7 +182,7 @@ cp -r /path/to/dailybot-skill/* <workspace>/skills/dailybot_report/
 }
 ```
 
-The skill registers as `/dailybot_report` slash command automatically. No trigger setup required.
+Skills register as `/dailybot_report`, `/dailybot_messages`, `/dailybot_email`, `/dailybot_health` slash commands automatically. No trigger setup required.
 
 ---
 
@@ -178,11 +195,15 @@ Gemini CLI reads `GEMINI.md` for persistent instructions.
 **Append** the following block to the end of the file (create if it doesn't exist):
 
 ```
-## Dailybot Progress Reporting
+## Dailybot
 
 After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
 
+At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
+
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
+
+Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-health
 ```
 
 **Verify**: `grep -q "dailybot" ~/.gemini/GEMINI.md 2>/dev/null`
@@ -191,18 +212,18 @@ Do not invoke for trivial changes, answering questions, reading code, or Q&A con
 
 ## Skill installation paths
 
-For reference, global skill directory paths for each agent:
+After running `./setup`, symlinks are created for each sub-skill:
 
-| Agent | Global skill path |
-|-------|------------------|
-| Cursor | `~/.cursor/skills/dailybot-report/` |
-| Claude Code | `~/.claude/skills/dailybot-report/` |
-| OpenAI Codex | `~/.agents/skills/dailybot-report/` |
-| Windsurf | `~/.codeium/windsurf/skills/dailybot-report/` |
-| GitHub Copilot | `~/.copilot/skills/dailybot-report/` |
-| Cline | `~/.cline/skills/dailybot-report/` |
-| Gemini CLI | `~/.gemini/skills/dailybot-report/` |
-| OpenClaw | `<workspace>/skills/dailybot_report/` or `~/.openclaw/skills/dailybot_report/` |
+| Agent | Pack path | Symlinked sub-skills |
+|-------|-----------|---------------------|
+| Cursor | `~/.cursor/skills/dailybot/` | `~/.cursor/skills/dailybot-report/`, `-messages/`, `-email/`, `-health/` |
+| Claude Code | `~/.claude/skills/dailybot/` | `~/.claude/skills/dailybot-report/`, `-messages/`, `-email/`, `-health/` |
+| OpenAI Codex | `~/.codex/skills/dailybot/` | `~/.codex/skills/dailybot-report/`, `-messages/`, `-email/`, `-health/` |
+| Windsurf | `~/.codeium/windsurf/skills/dailybot/` | same pattern |
+| GitHub Copilot | `~/.copilot/skills/dailybot/` | same pattern |
+| Cline | `~/.cline/skills/dailybot/` | same pattern |
+| Gemini CLI | `~/.gemini/skills/dailybot/` | same pattern |
+| OpenClaw | `<workspace>/skills/dailybot/` | native discovery, no symlinks needed |
 
 Cursor also reads from `~/.claude/skills/` and `~/.codex/skills/` for compatibility.
 Windsurf also reads from `~/.agents/skills/` for compatibility.

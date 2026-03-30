@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
-# detect-context.sh
+# context.sh — shared context detection for all Dailybot skills.
 # Detects the current coding environment and outputs JSON for Dailybot metadata.
 # Compatible with: Claude Code, Codex CLI, Cursor, Gemini CLI, OpenClaw, bare shell.
-# Usage: bash detect-context.sh
+#
+# Usage:  bash context.sh
 # Output: {"repo":"...","branch":"...","agent_tool":"...","agent_name":"..."}
+#
+# Manual fallback (when this script can't run):
+#   repo:   git remote get-url origin 2>/dev/null | sed 's|.*/||;s|\.git$||'
+#   branch: git branch --show-current 2>/dev/null
+#   If git fails, use the current folder name for repo and "unknown" for branch.
+#   Assemble metadata JSON manually:
+#   {"repo":"<repo>","branch":"<branch>","agent_tool":"<tool>","agent_name":"<name>","model":"<model>"}
+#   Model examples: "claude-sonnet-4-6", "o3", "gemini-2.5-pro", "gpt-4o"
 
 set -euo pipefail
 
@@ -86,7 +95,6 @@ if [[ "$AGENT_TOOL" == "unknown" ]]; then
 fi
 
 # ── Output ────────────────────────────────────────────────────────────────────
-# Escape any special characters in values for safe JSON output
 escape_json() {
   local s="$1"
   s="${s//\\/\\\\}"
