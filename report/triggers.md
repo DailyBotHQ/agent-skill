@@ -49,7 +49,7 @@ At the start of a work session, check for pending messages using the dailybot-me
 
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
-Available skills: /dailybot_report, /dailybot_messages, /dailybot_email, /dailybot_health
+User command: /dailybot_report. Agent-only skills: dailybot-messages, dailybot-email, dailybot-health.
 ```
 
 **Verify**: `grep -q "dailybot" ~/.claude/CLAUDE.md 2>/dev/null`
@@ -73,7 +73,7 @@ At the start of a work session, check for pending messages using the dailybot-me
 
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
-Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-health
+User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
 ```
 
 **Verify**: `grep -q "dailybot" ~/.codex/AGENTS.md 2>/dev/null`
@@ -122,7 +122,7 @@ At the start of a work session, check for pending messages using the dailybot-me
 
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
-Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-health
+User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
 ```
 
 **Verify**: `grep -q "dailybot" ~/.agents/AGENTS.md 2>/dev/null`
@@ -182,7 +182,7 @@ git clone https://github.com/DailyBotHQ/agent-skill.git <workspace>/skills/daily
 }
 ```
 
-Skills register as `/dailybot_report`, `/dailybot_messages`, `/dailybot_email`, `/dailybot_health` slash commands automatically. No trigger setup required.
+The `/dailybot` router and `/dailybot_report` register as slash commands. The messages, email, and health skills are agent-only (not user-invocable) and activate autonomously. No trigger setup required.
 
 ---
 
@@ -203,7 +203,7 @@ At the start of a work session, check for pending messages using the dailybot-me
 
 Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
-Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-health
+User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
 ```
 
 **Verify**: `grep -q "dailybot" ~/.gemini/GEMINI.md 2>/dev/null`
@@ -212,7 +212,7 @@ Available skills: dailybot-report, dailybot-messages, dailybot-email, dailybot-h
 
 ## Skill installation paths
 
-After running `./setup`, symlinks are created for each sub-skill:
+After running `./setup.sh`, symlinks are created for each sub-skill:
 
 | Agent | Pack path | Symlinked sub-skills |
 |-------|-----------|---------------------|

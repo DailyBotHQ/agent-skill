@@ -63,7 +63,7 @@ The setup script creates symlinks so each sub-skill is independently discoverabl
 
 ```bash
 cd ~/.cursor/skills/dailybot  # or whichever path you used
-./setup
+./setup.sh
 ```
 
 This auto-detects installed agents and creates symlinks like `dailybot-report`, `dailybot-messages`, `dailybot-email`, and `dailybot-health` alongside the main `dailybot` directory.
@@ -71,9 +71,9 @@ This auto-detects installed agents and creates symlinks like `dailybot-report`, 
 To target a specific agent:
 
 ```bash
-./setup --host claude
-./setup --host codex
-./setup --host auto    # detect all installed agents
+./setup.sh --host claude
+./setup.sh --host codex
+./setup.sh --host auto    # detect all installed agents
 ```
 
 ### 3. Invoke a skill
@@ -84,7 +84,7 @@ Open your IDE and mention Dailybot. The agent will route to the right skill:
 - "Do I have messages?" → **dailybot-messages**
 - "Email this to Alice" → **dailybot-email**
 
-Or invoke directly: `/dailybot_report`, `/dailybot_messages`, `/dailybot_email`, `/dailybot_health`.
+Or invoke directly: `/dailybot_report`. The messages, email, and health skills activate autonomously — the agent uses them without you needing to ask.
 
 On first use, the agent walks you through authentication (CLI login or API key).
 
@@ -101,7 +101,7 @@ No trigger setup needed — OpenClaw loads skills natively on every eligible ses
 ### Update
 
 ```bash
-cd <skill-path> && git pull && ./setup
+cd <skill-path> && git pull && ./setup.sh
 # OpenClaw: openclaw skills update dailybot
 ```
 
@@ -152,7 +152,7 @@ export DAILYBOT_API_KEY=your-key
 dailybot/
 ├── SKILL.md                 Root meta-skill — routes to the right sub-skill
 ├── README.md                This file
-├── setup                    Creates symlinks for agent platform discovery
+├── setup.sh                 Creates symlinks for agent platform discovery
 ├── shared/
 │   ├── auth.md              Shared auth logic (CLI login, API key, registration)
 │   ├── context.sh           Automated repo/branch/agent context detection
@@ -184,13 +184,13 @@ Both produce identical results.
 
 | Problem | Solution |
 |---------|----------|
-| Agent doesn't know about Dailybot | Verify the skill pack is in the correct path and run `./setup` |
+| Agent doesn't know about Dailybot | Verify the skill pack is in the correct path and run `./setup.sh` |
 | Skill found but not auto-activating | Invoke the report skill once — it sets up an always-on trigger |
 | "Dailybot CLI not found" | Install with `pip install dailybot-cli` or `curl -sSL https://cli.dailybot.com/install.sh \| bash` |
 | "Not authenticated" | Run `dailybot login`, `dailybot config key=<key>`, or set `DAILYBOT_API_KEY` |
 | Session seems stale | Run `dailybot logout` then `dailybot login` |
 | Reports not appearing | Run `dailybot status --auth` to check authentication and organization |
-| Symlinks not created | Run `./setup` from the skill pack directory |
+| Symlinks not created | Run `./setup.sh` from the skill pack directory |
 
 ## Links
 

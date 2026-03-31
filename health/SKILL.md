@@ -2,7 +2,7 @@
 name: dailybot_health
 description: Announce agent online/offline status to Dailybot and receive pending messages from the team. Use for long-running or scheduled agents to stay visible and pick up instructions.
 homepage: https://api.dailybot.com/skill.md
-user-invocable: true
+user-invocable: false
 metadata: {"openclaw":{"emoji":"💚","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"],"env":["DAILYBOT_API_KEY"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"node","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
 ---

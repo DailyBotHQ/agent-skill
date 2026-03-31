@@ -20,7 +20,7 @@ while [ $# -gt 0 ]; do
     --host) [ -z "$2" ] && echo "Missing value for --host" >&2 && exit 1; HOST="$2"; shift 2 ;;
     --host=*) HOST="${1#--host=}"; shift ;;
     -h|--help)
-      echo "Usage: ./setup [--host claude|cursor|codex|windsurf|copilot|cline|gemini|auto]"
+      echo "Usage: ./setup.sh [--host claude|cursor|codex|windsurf|copilot|cline|gemini|auto]"
       echo ""
       echo "Creates symlinks for each Dailybot sub-skill so your agent discovers them."
       echo "Run without --host to auto-detect, or specify an agent explicitly."
