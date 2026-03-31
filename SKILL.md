@@ -3,7 +3,7 @@ name: dailybot
 description: Dailybot skill pack — report progress, check messages, send emails, and announce agent status. Routes to the right sub-skill based on intent. Use when the developer mentions Dailybot or wants to interact with their team.
 homepage: https://api.dailybot.com/skill.md
 user-invocable: true
-metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"],"env":["DAILYBOT_API_KEY"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"node","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
+metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
 ---
 

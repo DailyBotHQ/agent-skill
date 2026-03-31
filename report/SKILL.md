@@ -3,7 +3,7 @@ name: dailybot_report
 description: Report meaningful work progress to Dailybot so the developer's team has visibility. Activate after completing features, fixing bugs, finishing major tasks, or wrapping up a work session. Do not activate for trivial changes, reading code, or Q&A conversations.
 homepage: https://api.dailybot.com/skill.md
 user-invocable: true
-metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"],"env":["DAILYBOT_API_KEY"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"node","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
+metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
