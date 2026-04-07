@@ -44,6 +44,8 @@ command -v dailybot
 
 ## Step 3A — Health Check via CLI
 
+> **Timeout**: Allow at least 30 seconds for CLI commands to complete. Do not use a shorter timeout.
+
 ### Announce healthy status
 
 ```bash

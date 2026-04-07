@@ -45,6 +45,8 @@ command -v dailybot
 
 ## Step 3A — Fetch Messages via CLI
 
+> **Timeout**: Allow at least 30 seconds for CLI commands to complete. Do not use a shorter timeout.
+
 ```bash
 dailybot agent message list --name "<agent_name>" --pending
 ```

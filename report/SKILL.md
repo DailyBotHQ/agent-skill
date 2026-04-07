@@ -132,6 +132,8 @@ Model identifier examples: `"claude-sonnet-4-6"`, `"o3"`, `"gemini-2.5-pro"`, `"
 ## Step 4A — Send Report via CLI
 
 > Use this path when `command -v dailybot` succeeds.
+>
+> **Timeout**: Allow at least 30 seconds for CLI commands to complete. Do not use a shorter timeout.
 
 ### Flag reference
 
