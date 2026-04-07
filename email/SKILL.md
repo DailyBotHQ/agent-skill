@@ -3,7 +3,7 @@ name: dailybot_email
 description: Send emails to any address via Dailybot on behalf of the agent. Use for notifications, summaries, follow-ups, or any communication the developer asks you to send via email.
 homepage: https://api.dailybot.com/skill.md
 user-invocable: false
-metadata: {"openclaw":{"emoji":"📧","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
+metadata: {"openclaw":{"emoji":"📧","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"cli-install-script","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (official script — preferred on Linux/macOS)"},{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI via pip (fallback if binary fails)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
 ---
 

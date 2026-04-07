@@ -86,17 +86,21 @@ Open your IDE and mention Dailybot. The agent will route to the right skill:
 
 Or invoke directly: `/dailybot_report`. The messages, email, and health skills activate autonomously — the agent uses them without you needing to ask.
 
-On first use, the agent walks you through authentication (CLI login or API key).
+On first use, the agent installs the Dailybot CLI if needed (official install script first, then pip; see `shared/auth.md`), then walks you through authentication (OTP login is preferred; API key or HTTP fallback when the CLI cannot run).
 
 ### OpenClaw
 
-OpenClaw has a native skill registry. Install directly without cloning:
+OpenClaw has a native skill registry. Install the **full skill pack** — do not use `https://api.dailybot.com/skill.md` as a substitute for the pack. That URL is the **API reference** (curl + endpoints), not the repository with the router, `shared/`, and sub-skills.
 
 ```bash
 openclaw skills install dailybot
 ```
 
-No trigger setup needed — OpenClaw loads skills natively on every eligible session.
+Or clone [DailyBotHQ/agent-skill](https://github.com/DailyBotHQ/agent-skill) into `<workspace>/skills/dailybot/`.
+
+No trigger setup needed — OpenClaw loads skills natively on every eligible session. On first Dailybot action, the agent should install the CLI automatically per `shared/auth.md` (no extra “may I install?” step for normal installs).
+
+The `homepage` field in each `SKILL.md` may still point to `https://api.dailybot.com/skill.md` for API documentation — that is intentional; it does not mean “install from this URL only.”
 
 ### Update
 
@@ -153,6 +157,8 @@ dailybot/
 ├── SKILL.md                 Root meta-skill — routes to the right sub-skill
 ├── README.md                This file
 ├── setup.sh                 Creates symlinks for agent platform discovery
+├── docs/
+│   └── openclaw.md          OpenClaw install + CLI first-run notes
 ├── shared/
 │   ├── auth.md              Shared auth logic (CLI login, API key, registration)
 │   ├── context.sh           Automated repo/branch/agent context detection

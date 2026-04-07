@@ -3,7 +3,7 @@ name: dailybot
 description: Dailybot skill pack — report progress, check messages, send emails, and announce agent status. Routes to the right sub-skill based on intent. Use when the developer mentions Dailybot or wants to interact with their team.
 homepage: https://api.dailybot.com/skill.md
 user-invocable: true
-metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
+metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"cli-install-script","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (official script — preferred on Linux/macOS)"},{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI via pip (fallback if binary fails)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -15,11 +15,22 @@ Dailybot connects AI coding agents to their human team. This is a skill pack wit
 
 ---
 
+## OpenClaw and `https://api.dailybot.com/skill.md`
+
+The `homepage` in frontmatter may point to `https://api.dailybot.com/skill.md`. That URL is the **public API reference** (HTTP endpoints and curl examples). It is **not** the GitHub skill pack (router, `shared/`, sub-skills, `setup.sh`).
+
+- **OpenClaw:** Install the pack with `openclaw skills install dailybot`, or clone `https://github.com/DailyBotHQ/agent-skill` into `<workspace>/skills/dailybot/`.
+- **Do not** treat downloading only `api.dailybot.com/skill.md` as a full install — agents need the complete repository or registry install.
+
+**Dailybot CLI:** Before any API call, ensure the CLI exists (`command -v dailybot`). If missing, **install it automatically** — do not wait for a separate “may I install?” step. Follow the order in [`shared/auth.md`](shared/auth.md): official install script first (best on most Linux/macOS), then pip, then HTTP fallback with `DAILYBOT_API_KEY` if the CLI cannot run.
+
+---
+
 ## Available Skills
 
 | Skill | Directory | What it does |
 |-------|-----------|-------------|
-| **Report** | [`report/SKILL.md`](report/SKILL.md) | Send progress updates after completing meaningful work |
+| **Report** | [`report/SKILL.md`](report/SKILL.md) | Send progress updates after completing a task/subtask or editing 3+ files |
 | **Messages** | [`messages/SKILL.md`](messages/SKILL.md) | Check for pending messages and instructions from the team |
 | **Email** | [`email/SKILL.md`](email/SKILL.md) | Send emails to any address via Dailybot |
 | **Health** | [`health/SKILL.md`](health/SKILL.md) | Announce agent online/offline status and receive messages |
@@ -41,7 +52,7 @@ Match the developer's intent to the right skill and **read that skill's SKILL.md
 
 | Situation | Route to |
 |-----------|----------|
-| You just completed significant work (feature, bug fix, refactor, etc.) | **Report** → read [`report/SKILL.md`](report/SKILL.md) |
+| You completed a task/subtask, or edited 3+ files | **Report** → read [`report/SKILL.md`](report/SKILL.md) |
 | Starting a long work session or idle for 15+ minutes | **Health** → read [`health/SKILL.md`](health/SKILL.md) |
 
 If the intent is ambiguous, default to **Report** — it's the most common use case.

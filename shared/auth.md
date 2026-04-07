@@ -2,7 +2,7 @@
 
 This file is shared across all Dailybot skills. Every skill references it for auth setup before performing its primary action.
 
-Run these checks in order. Stop at the first failure. Present **one clear action** to the developer at a time — never ask multiple questions at once.
+Run these checks in order. Stop at the first failure. Present **one clear action** to the developer at a time during interactive login — never ask multiple questions at once.
 
 ---
 
@@ -12,17 +12,51 @@ Run these checks in order. Stop at the first failure. Present **one clear action
 command -v dailybot
 ```
 
-If not found:
+If `dailybot` is found, verify it runs:
 
-> "To connect to Dailybot, I need the Dailybot CLI. You can install it with:
-> - `pip install dailybot-cli` (requires Python 3.9+)
-> - `curl -sSL https://cli.dailybot.com/install.sh | bash`
->
-> Let me know once it's installed."
+```bash
+dailybot --version 2>&1 || dailybot status --auth 2>&1
+```
 
-**Do not install without the developer's permission.** Wait for confirmation, then re-check.
+### If the CLI is not installed — install automatically
 
-If the CLI cannot be installed (sandboxed environment, CI container) — proceed anyway. The HTTP fallback works without it. See [`http-fallback.md`](http-fallback.md) for the curl-based path.
+Using this skill means you should **install the Dailybot CLI yourself** when it is missing. Do **not** ask the developer for permission to run a normal (non-root) install. Do **not** tell them to install manually and wait unless the environment truly blocks you (e.g. no network, read-only filesystem).
+
+**Preferred order:**
+
+1. **Official install script** (prebuilt binary on many systems — usually fastest on Linux/macOS):
+
+   ```bash
+   curl -sSL https://cli.dailybot.com/install.sh | bash
+   ```
+
+   If piping to `bash` is disallowed, download the script, inspect if required, then run it.
+
+2. **Pip fallback** (use when the binary from the script fails at runtime — e.g. GLIBC mismatch — or the script is unavailable):
+
+   ```bash
+   pip install dailybot-cli
+   ```
+
+   Try `pip3`, `python3 -m pip install --user dailybot-cli`, or `python3 -m pip install dailybot-cli` as needed.
+
+3. **Escalation (only with user approval):** If pip is missing, you may suggest **one** of `sudo dnf install python3-pip`, `sudo yum install python3-pip`, or `sudo apt install python3-pip` — **only if** the developer can approve elevated installs. Do not loop through many system package managers.
+
+After each install attempt, re-check:
+
+```bash
+command -v dailybot
+```
+
+### If the CLI still cannot be installed
+
+Stop trying endless installers. Briefly explain the limitation, then use the **HTTP API** path with `DAILYBOT_API_KEY` per [`http-fallback.md`](http-fallback.md). Ask the developer to create an API key at Dailybot → Settings → API Keys and export it:
+
+```bash
+export DAILYBOT_API_KEY="<their-key>"
+```
+
+Sandboxed environments, CI, or minimal containers may never get a working CLI — HTTP fallback is expected there.
 
 ---
 

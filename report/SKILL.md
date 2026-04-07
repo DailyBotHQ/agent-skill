@@ -1,15 +1,15 @@
 ---
 name: dailybot_report
-description: Report meaningful work progress to Dailybot so the developer's team has visibility. Activate after completing features, fixing bugs, finishing major tasks, or wrapping up a work session. Do not activate for trivial changes, reading code, or Q&A conversations.
+description: Report work progress to Dailybot. Activate after completing a discrete task or subtask, or after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what changed and why.
 homepage: https://api.dailybot.com/skill.md
 user-invocable: true
-metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI (pip)"},{"id":"curl-fallback","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (install script)"}]}}
+metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"cli-install-script","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (official script — preferred on Linux/macOS)"},{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI via pip (fallback if binary fails)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
 # Dailybot Progress Report
 
-You help developers keep their team informed. When you finish meaningful work, you send a short progress update to Dailybot. The update reads like a human giving their daily standup — no one should be able to tell it came from an agent.
+You help developers keep their team informed. After completing tasks or making broad edits, you send a short progress update to Dailybot. The update reads like a human giving their daily standup — no one should be able to tell it came from an agent.
 
 ---
 
@@ -34,7 +34,7 @@ When natural language triggers apply, the skill activates on phrases like: "repo
 
 ## Step 0 — Auto-Activation Setup (First Run Only)
 
-This step makes the skill activate automatically after significant work in future sessions, without the developer needing to invoke it each time.
+This step makes the skill activate automatically in future sessions, without the developer needing to invoke it each time.
 
 ### Check if the trigger is already installed
 
@@ -58,7 +58,7 @@ The developer invoked this skill, so they want Dailybot reporting. Do not ask fo
 
 After creating it, tell the developer:
 
-> "I've set up Dailybot to automatically report progress after significant work. One-time setup — from your next session onward, it happens automatically."
+> "I've set up Dailybot to automatically report progress after completing tasks or editing 3+ files. One-time setup — from your next session onward, it happens automatically."
 
 Then proceed immediately to Step 1. Do not wait for a response.
 
@@ -239,37 +239,28 @@ curl -s -X POST https://api.dailybot.com/v1/agent-reports/ \
 
 ---
 
-## Step 5 — Evaluate Significance
+## Step 5 — Trigger Check
 
-Before finishing your response to the developer, ask yourself:
+Send a progress report after each of the following:
 
-> **"Would this work be worth mentioning in a real daily standup with the team?"**
+1. **Task completed** — You finished a discrete task or subtask (e.g., a todo item, a user-requested change, a bug fix, a feature).
+2. **Broad edit** — You modified 3 or more files in a single batch of edits.
 
-If no — do nothing. Do not mention Dailybot. Complete silence.
+Do not wait for permission. Do not second-guess whether the work is "significant enough." If either condition is met, report.
 
-If yes — proceed to Step 6.
+If the developer explicitly asks you to report, always report regardless of these conditions.
 
-For detailed criteria and edge cases, see [`significance.md`](significance.md).
+### What to include
 
-### Quick reference
+Every report must answer two questions:
+- **What changed** — concrete outcomes, not file paths
+- **Why** — the purpose or motivation behind the change
 
-**Report these:** feature implemented, bug fixed, major refactor completed, multi-step task finished, test suite added, deployment or migration executed, meaningful documentation written, analysis or research completed with findings.
+### Aggregate related work
 
-**Skip these:** answering questions, reading or exploring code, making plans, typo or formatting fixes, lockfile updates, failed attempts, uncommitted WIP, anything you can't describe specifically.
+If you completed multiple related changes, combine them into one report. Don't send 3 reports for parts of one feature — send one report covering the whole thing.
 
-### When to evaluate
-
-- After completing the developer's task, before your final response
-- After committing code
-- When the developer explicitly asks ("report this", "send an update", "let my team know")
-- At end of session, if there is unreported significant work
-
-### When not to evaluate
-
-- During exploratory work with no output
-- When only reading or analyzing code
-- When the developer is still mid-task
-- For trivial changes
+For detailed guidelines, see [`significance.md`](significance.md).
 
 ---
 
@@ -306,9 +297,7 @@ Each item: concise, human-readable string. Empty arrays are fine.
 
 ### Milestone flag
 
-Use for: major feature fully shipped, significant multi-step effort completed, deployment or migration executed.
-
-Do not use for: regular commits, individual bug fixes, incremental progress.
+Mark a report as a milestone only when the **top-level task is fully completed** — all subtasks are done and the entire requested piece of work is wrapped up. Individual subtask completions are regular reports, not milestones. If the developer explicitly asks for a milestone, always honor it.
 
 ### Co-authors
 

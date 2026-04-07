@@ -1,6 +1,6 @@
 # Auto-Activation Triggers
 
-This file contains the exact trigger templates for each supported agent. A trigger is a small always-on instruction that tells the agent to invoke Dailybot skills after completing significant work — primarily the `dailybot-report` skill, but also to check messages at session start and send periodic health checks.
+This file contains the exact trigger templates for each supported agent. A trigger is a small always-on instruction that tells the agent to invoke Dailybot skills after completing tasks or making broad edits — primarily the `dailybot-report` skill, but also to check messages at session start and send periodic health checks.
 
 Step 0 in [SKILL.md](SKILL.md) uses these templates to configure auto-activation on first run. You do not need to create these manually — the agent handles it when you first invoke the report skill.
 
@@ -19,13 +19,11 @@ Cursor uses `.mdc` rule files with YAML frontmatter.
 description: Invoke Dailybot skills for progress reporting, message checking, and team coordination
 alwaysApply: true
 ---
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the `dailybot-report` skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the `dailybot-report` skill to send the report.
 
 At the start of a work session, check for pending messages from the team using the `dailybot-messages` skill.
 
 During long sessions (15+ minutes), send periodic health checks using the `dailybot-health` skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 ```
 
 **Verify**: `test -f ~/.cursor/rules/dailybot.mdc`
@@ -43,11 +41,9 @@ Claude Code reads `CLAUDE.md` files for persistent instructions.
 ```
 ## Dailybot
 
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
 User command: /dailybot_report. Agent-only skills: dailybot-messages, dailybot-email, dailybot-health.
 ```
@@ -67,11 +63,9 @@ Codex reads `AGENTS.md` files for persistent instructions.
 ```
 ## Dailybot
 
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
 User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
 ```
@@ -94,11 +88,9 @@ Windsurf uses global rules managed through Settings, or files in `.windsurf/rule
 ---
 trigger: always_on
 ---
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the `dailybot-report` skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the `dailybot-report` skill to send the report.
 
 At the start of a work session, check for pending messages using the `dailybot-messages` skill. During long sessions, send periodic health checks using the `dailybot-health` skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 ```
 
 **Verify**: Ask the developer if Dailybot appears in their Windsurf rules, or check `test -f .windsurf/rules/dailybot.md`
@@ -116,11 +108,9 @@ Copilot reads `AGENTS.md` files for agent instructions.
 ```
 ## Dailybot
 
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
 User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
 ```
@@ -140,11 +130,9 @@ Cline reads `.clinerules` files for persistent instructions.
 ```
 ## Dailybot
 
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 ```
 
 **Verify**: `grep -q "dailybot" ~/.cline/.clinerules 2>/dev/null`
@@ -197,11 +185,9 @@ Gemini CLI reads `GEMINI.md` for persistent instructions.
 ```
 ## Dailybot
 
-After completing significant coding work — implementing features, fixing bugs, refactoring code, adding tests, deploying, writing documentation, or finishing multi-step tasks — invoke the dailybot-report skill to evaluate whether a progress update should be sent to the team via Dailybot.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
-
-Do not invoke for trivial changes, answering questions, reading code, or Q&A conversations.
 
 User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
 ```
