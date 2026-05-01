@@ -1,7 +1,8 @@
 ---
-name: dailybot_report
-description: Report work progress to Dailybot. Activate after completing a discrete task or subtask, or after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what changed and why.
-homepage: https://api.dailybot.com/skill.md
+name: dailybot-report
+description: Report work progress to Dailybot. Activate after completing a discrete task or subtask, or after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why.
+version: "1.0.0"
+documentation_url: https://api.dailybot.com/skill.md
 user-invocable: true
 metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"cli-install-script","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (official script — preferred on Linux/macOS)"},{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI via pip (fallback if binary fails)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
@@ -32,9 +33,13 @@ When natural language triggers apply, the skill activates on phrases like: "repo
 
 ---
 
-## Step 0 — Auto-Activation Setup (First Run Only)
+## Step 0 — Optional Auto-Activation Setup (First Run Only)
 
-This step makes the skill activate automatically in future sessions, without the developer needing to invoke it each time.
+Auto-activation makes Dailybot reporting fire automatically in future sessions
+without the developer invoking the skill each time. **It is opt-in.** Writing
+to a global agent config file (`CLAUDE.md`, `AGENTS.md`, etc.) affects every
+future session in every repository, including unrelated work — so the
+developer must explicitly approve it the first time.
 
 ### Check if the trigger is already installed
 
@@ -42,25 +47,48 @@ Identify which agent you are and run the corresponding check:
 
 | Agent | Check |
 |-------|-------|
-| Claude Code | `grep -q "dailybot" ~/.claude/CLAUDE.md 2>/dev/null && echo "installed"` |
+| Claude Code | `grep -q "dailybot-auto-activation" ~/.claude/CLAUDE.md 2>/dev/null && echo "installed"` |
 | OpenClaw | *(skip — OpenClaw loads this skill natively on every eligible session)* |
 | Cursor | `test -f ~/.cursor/rules/dailybot.mdc && echo "installed"` |
-| Codex | `grep -q "dailybot" ~/.codex/AGENTS.md 2>/dev/null && echo "installed"` |
+| Codex | `grep -q "dailybot-auto-activation" ~/.codex/AGENTS.md 2>/dev/null && echo "installed"` |
 | Windsurf | `test -f .windsurf/rules/dailybot.md && echo "installed"` |
-| Copilot | `grep -q "dailybot" ~/.agents/AGENTS.md 2>/dev/null && echo "installed"` |
-| Cline | `grep -q "dailybot" ~/.cline/.clinerules 2>/dev/null && echo "installed"` |
+| Copilot | `grep -q "dailybot-auto-activation" ~/.agents/AGENTS.md 2>/dev/null && echo "installed"` |
+| Cline | `grep -q "dailybot-auto-activation" ~/.cline/.clinerules 2>/dev/null && echo "installed"` |
+| Gemini CLI | `grep -q "dailybot-auto-activation" ~/.gemini/GEMINI.md 2>/dev/null && echo "installed"` |
 
 If output says "installed" — skip to Step 1.
 
-### If missing — create it now
+### If missing — ask before creating
 
-The developer invoked this skill, so they want Dailybot reporting. Do not ask for permission. Read [`triggers.md`](triggers.md) for the exact file path, format, and content for your agent, then create the trigger file.
+Read [`triggers.md`](triggers.md) for the exact file path and content for the
+current agent. Show the developer this prompt **before writing anything**:
 
-After creating it, tell the developer:
+> "Dailybot reporting can run automatically after every task or broad edit,
+> across all your future sessions. To set that up, I'd add the block below to
+> **`<file path>`**:
+>
+> ```
+> <exact content from triggers.md, including the
+> dailybot-auto-activation markers>
+> ```
+>
+> This affects **every repository** you open with this agent. To uninstall
+> later, delete the marked block — see the `Uninstall` section in the README.
+>
+> **Should I add it now?** (yes / no / not now)"
 
-> "I've set up Dailybot to automatically report progress after completing tasks or editing 3+ files. One-time setup — from your next session onward, it happens automatically."
+- **Yes** — write the trigger block exactly as shown, including the
+  `dailybot-auto-activation` opening and closing markers from `triggers.md`,
+  then continue to Step 1.
+- **No / not now** — skip auto-activation for this session and continue to
+  Step 1. Do not re-ask in the same session.
 
-Then proceed immediately to Step 1. Do not wait for a response.
+If the developer accepts, briefly confirm:
+
+> "Added. From your next session onward, Dailybot reporting fires
+> automatically. Remove the marked block in `<file path>` to disable."
+
+Then proceed to Step 1.
 
 ---
 
@@ -248,7 +276,10 @@ Send a progress report after each of the following:
 1. **Task completed** — You finished a discrete task or subtask (e.g., a todo item, a user-requested change, a bug fix, a feature).
 2. **Broad edit** — You modified 3 or more files in a single batch of edits.
 
-Do not wait for permission. Do not second-guess whether the work is "significant enough." If either condition is met, report.
+Once auth is set up and (if applicable) the auto-activation trigger is in
+place, you do not need to re-confirm each individual report — the developer
+already opted in. Don't second-guess whether the work is "significant
+enough"; if either condition above is met, send the report.
 
 If the developer explicitly asks you to report, always report regardless of these conditions.
 

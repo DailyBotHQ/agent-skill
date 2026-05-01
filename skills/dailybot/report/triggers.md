@@ -1,8 +1,24 @@
 # Auto-Activation Triggers
 
-This file contains the exact trigger templates for each supported agent. A trigger is a small always-on instruction that tells the agent to invoke Dailybot skills after completing tasks or making broad edits — primarily the `dailybot-report` skill, but also to check messages at session start and send periodic health checks.
+This file contains the exact trigger templates for each supported agent. A
+trigger is a small always-on instruction that tells the agent to invoke
+Dailybot skills after completing tasks or making broad edits — primarily the
+`dailybot-report` skill, but also to check messages at session start and send
+periodic health checks.
 
-Step 0 in [SKILL.md](SKILL.md) uses these templates to configure auto-activation on first run. You do not need to create these manually — the agent handles it when you first invoke the report skill.
+Step 0 in [SKILL.md](SKILL.md) uses these templates **only after the developer
+explicitly confirms** the skill should write to a global agent config file.
+Each template is wrapped in a marker so the block can be located and removed
+later:
+
+```
+<!-- dailybot-auto-activation: BEGIN -->
+...content...
+<!-- dailybot-auto-activation: END   (delete this block to disable) -->
+```
+
+To uninstall on any agent, search for `dailybot-auto-activation` in the file
+listed below and delete from BEGIN to END (inclusive).
 
 ---
 
@@ -12,18 +28,21 @@ Cursor uses `.mdc` rule files with YAML frontmatter.
 
 **Path**: `~/.cursor/rules/dailybot.mdc`
 
-**Create this file** with the following content:
+**Create this file** with the following content (the file existing IS the
+opt-in marker — to uninstall, delete the file):
 
 ```
 ---
 description: Invoke Dailybot skills for progress reporting, message checking, and team coordination
 alwaysApply: true
 ---
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the `dailybot-report` skill to send the report.
+<!-- dailybot-auto-activation: BEGIN — delete this file to disable -->
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the `dailybot-report` skill to send the report.
 
 At the start of a work session, check for pending messages from the team using the `dailybot-messages` skill.
 
 During long sessions (15+ minutes), send periodic health checks using the `dailybot-health` skill.
+<!-- dailybot-auto-activation: END -->
 ```
 
 **Verify**: `test -f ~/.cursor/rules/dailybot.mdc`
@@ -36,19 +55,22 @@ Claude Code reads `CLAUDE.md` files for persistent instructions.
 
 **Path**: `~/.claude/CLAUDE.md`
 
-**Append** the following block to the end of the file (create the file if it doesn't exist):
+**Append** the following block to the end of the file (create the file if it
+doesn't exist):
 
 ```
+<!-- dailybot-auto-activation: BEGIN -->
 ## Dailybot
 
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
 
 User command: /dailybot_report. Agent-only skills: dailybot-messages, dailybot-email, dailybot-health.
+<!-- dailybot-auto-activation: END   (delete this block to disable) -->
 ```
 
-**Verify**: `grep -q "dailybot" ~/.claude/CLAUDE.md 2>/dev/null`
+**Verify**: `grep -q "dailybot-auto-activation" ~/.claude/CLAUDE.md 2>/dev/null`
 
 ---
 
@@ -58,29 +80,36 @@ Codex reads `AGENTS.md` files for persistent instructions.
 
 **Path**: `~/.codex/AGENTS.md`
 
-**Append** the following block to the end of the file (create the file if it doesn't exist):
+**Append** the following block to the end of the file (create the file if it
+doesn't exist):
 
 ```
+<!-- dailybot-auto-activation: BEGIN -->
 ## Dailybot
 
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
 
 User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
+<!-- dailybot-auto-activation: END   (delete this block to disable) -->
 ```
 
-**Verify**: `grep -q "dailybot" ~/.codex/AGENTS.md 2>/dev/null`
+**Verify**: `grep -q "dailybot-auto-activation" ~/.codex/AGENTS.md 2>/dev/null`
 
 ---
 
 ## Windsurf
 
-Windsurf uses global rules managed through Settings, or files in `.windsurf/rules/`.
+Windsurf uses global rules managed through Settings, or files in
+`.windsurf/rules/`.
 
-**Preferred**: Ask the developer to add a global rule through **Settings > Cascade > Rules** with activation mode **Always On** and the content below.
+**Preferred**: Ask the developer to add a global rule through
+**Settings > Cascade > Rules** with activation mode **Always On** and the
+content below.
 
-**Alternative** — if the developer prefers a file, create a workspace rule:
+**Alternative** — if the developer prefers a file, create a workspace rule
+(deleting the file disables the trigger):
 
 **Path**: `.windsurf/rules/dailybot.md`
 
@@ -88,12 +117,15 @@ Windsurf uses global rules managed through Settings, or files in `.windsurf/rule
 ---
 trigger: always_on
 ---
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the `dailybot-report` skill to send the report.
+<!-- dailybot-auto-activation: BEGIN — delete this file to disable -->
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the `dailybot-report` skill to send the report.
 
 At the start of a work session, check for pending messages using the `dailybot-messages` skill. During long sessions, send periodic health checks using the `dailybot-health` skill.
+<!-- dailybot-auto-activation: END -->
 ```
 
-**Verify**: Ask the developer if Dailybot appears in their Windsurf rules, or check `test -f .windsurf/rules/dailybot.md`
+**Verify**: Ask the developer if Dailybot appears in their Windsurf rules, or
+check `test -f .windsurf/rules/dailybot.md`
 
 ---
 
@@ -103,19 +135,22 @@ Copilot reads `AGENTS.md` files for agent instructions.
 
 **Path**: `~/.agents/AGENTS.md`
 
-**Append** the following block to the end of the file (create the file if it doesn't exist):
+**Append** the following block to the end of the file (create the file if it
+doesn't exist):
 
 ```
+<!-- dailybot-auto-activation: BEGIN -->
 ## Dailybot
 
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
 
 User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
+<!-- dailybot-auto-activation: END   (delete this block to disable) -->
 ```
 
-**Verify**: `grep -q "dailybot" ~/.agents/AGENTS.md 2>/dev/null`
+**Verify**: `grep -q "dailybot-auto-activation" ~/.agents/AGENTS.md 2>/dev/null`
 
 ---
 
@@ -125,23 +160,28 @@ Cline reads `.clinerules` files for persistent instructions.
 
 **Path**: `~/.cline/.clinerules`
 
-**Append** the following block to the end of the file (create the file if it doesn't exist):
+**Append** the following block to the end of the file (create the file if it
+doesn't exist):
 
 ```
+<!-- dailybot-auto-activation: BEGIN -->
 ## Dailybot
 
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
+<!-- dailybot-auto-activation: END   (delete this block to disable) -->
 ```
 
-**Verify**: `grep -q "dailybot" ~/.cline/.clinerules 2>/dev/null`
+**Verify**: `grep -q "dailybot-auto-activation" ~/.cline/.clinerules 2>/dev/null`
 
 ---
 
 ## OpenClaw
 
-OpenClaw uses the AgentSkills-compatible `SKILL.md` format natively. **No trigger file is needed** — OpenClaw loads skills automatically on every eligible session based on gating rules in the frontmatter `metadata` field.
+OpenClaw uses the AgentSkills-compatible `SKILL.md` format natively.
+**No trigger file is needed** — OpenClaw loads skills automatically on every
+eligible session based on gating rules in the frontmatter `metadata` field.
 
 **Install via ClawHub (recommended):**
 
@@ -170,7 +210,9 @@ git clone https://github.com/DailyBotHQ/agent-skill.git <workspace>/skills/daily
 }
 ```
 
-The `/dailybot` router and `/dailybot_report` register as slash commands. The messages, email, and health skills are agent-only (not user-invocable) and activate autonomously. No trigger setup required.
+The `/dailybot` router and `/dailybot_report` register as slash commands. The
+messages, email, and health skills are agent-only (not user-invocable) and
+activate autonomously. No trigger setup required.
 
 ---
 
@@ -180,19 +222,22 @@ Gemini CLI reads `GEMINI.md` for persistent instructions.
 
 **Path**: `~/.gemini/GEMINI.md`
 
-**Append** the following block to the end of the file (create if it doesn't exist):
+**Append** the following block to the end of the file (create if it doesn't
+exist):
 
 ```
+<!-- dailybot-auto-activation: BEGIN -->
 ## Dailybot
 
-Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Do not wait for permission. Include what you changed and why. Use the dailybot-report skill to send the report.
+Send a progress report to Dailybot after each of the following: (a) completing a discrete task or subtask, or (b) after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why. Use the dailybot-report skill to send the report.
 
 At the start of a work session, check for pending messages using the dailybot-messages skill. During long sessions, send periodic health checks using the dailybot-health skill.
 
 User-invocable: dailybot-report. Agent-only: dailybot-messages, dailybot-email, dailybot-health.
+<!-- dailybot-auto-activation: END   (delete this block to disable) -->
 ```
 
-**Verify**: `grep -q "dailybot" ~/.gemini/GEMINI.md 2>/dev/null`
+**Verify**: `grep -q "dailybot-auto-activation" ~/.gemini/GEMINI.md 2>/dev/null`
 
 ---
 
@@ -211,6 +256,7 @@ After running `./setup.sh`, symlinks are created for each sub-skill:
 | Gemini CLI | `~/.gemini/skills/dailybot/` | same pattern |
 | OpenClaw | `<workspace>/skills/dailybot/` | native discovery, no symlinks needed |
 
-Cursor also reads from `~/.claude/skills/` and `~/.codex/skills/` for compatibility.
-Windsurf also reads from `~/.agents/skills/` for compatibility.
-Copilot also reads from `~/.claude/skills/` and `~/.agents/skills/` for compatibility.
+Cursor also reads from `~/.claude/skills/` and `~/.codex/skills/` for
+compatibility. Windsurf also reads from `~/.agents/skills/` for compatibility.
+Copilot also reads from `~/.claude/skills/` and `~/.agents/skills/` for
+compatibility.
