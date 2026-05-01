@@ -63,9 +63,9 @@ build/
 out/
 
 # Repo `tmp/` for scratch work (see AGENTS.md "Temporary Files")
-# Ignore everything inside, but keep the README so the convention is documented.
+# Ignore everything inside; keep only `.gitkeep` so the directory is tracked.
 tmp/*
-!tmp/README.md
+!tmp/.gitkeep
 
 # Accidentally created skill runtime markers during local testing
 /.dailybot/

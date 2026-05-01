@@ -412,10 +412,12 @@ to per-agent files — `AGENTS.md` is the canonical source.
 
 ## Temporary Files (tmp/)
 
-The `tmp/` folder at the repo root is **git-ignored** (everything except
-its own `README.md`) and exists so agents and contributors can do scratch
-work without polluting the working tree or risking accidental commits of
-debug output. The folder is yours — write freely, clean up when done.
+The `tmp/` folder at the repo root is **git-ignored entirely** — the
+directory is preserved with a `.gitkeep` placeholder, but every file or
+subdirectory you create inside it is invisible to git. It exists so
+agents and contributors can do scratch work without polluting the
+working tree or risking accidental commits of debug output. The folder
+is yours — write freely, clean up when done.
 
 Use `tmp/` for:
 
