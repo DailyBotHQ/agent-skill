@@ -209,8 +209,8 @@ All DailyBot operations have CLI equivalents. Once authenticated, use these dire
 | Report work | `dailybot agent update "Implemented auth module and added tests" --name "your-agent-name"` |
 | Report a milestone | `dailybot agent update "Shipped v2.0" --name "your-agent-name" --milestone` |
 | Report with co-authors | `dailybot agent update "Built auth with Alice" --name "your-agent-name" --co-authors alice@company.com` |
-| Report with metadata | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --metadata '{"repo": "api-services", "branch": "main"}'` |
-| Report with extra data | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --json-data '{"repo": "api-services", "pr": "#142"}'` |
+| Report with metadata | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --metadata '{"repo": "my-api", "branch": "main"}'` |
+| Report with extra data | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --json-data '{"repo": "my-api", "pr": "#142"}'` |
 | Health check (ok) | `dailybot agent health --ok --message "Working on task queue" --name "your-agent-name"` |
 | Health check (failing) | `dailybot agent health --fail --message "DB unreachable" --name "your-agent-name"` |
 | Check health status | `dailybot agent health --status --name "your-agent-name"` |
@@ -290,7 +290,7 @@ curl -X POST https://api.dailybot.com/v1/agent-reports/ \
       "blockers": []
     },
     "metadata": {
-      "repo": "api-services",
+      "repo": "my-api",
       "branch": "feature/auth",
       "pr": "#142"
     }
