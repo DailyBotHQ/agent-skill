@@ -61,7 +61,11 @@ If output says "installed" — skip to Step 1.
 ### If missing — ask before creating
 
 Read [`triggers.md`](triggers.md) for the exact file path and content for the
-current agent. Show the developer this prompt **before writing anything**:
+current agent.
+
+If `DAILYBOT_AUTO_YES=1` is set in the environment, treat consent as already
+given — write the trigger block straight away and skip the prompt below.
+Otherwise, show the developer this prompt **before writing anything**:
 
 > "Dailybot reporting can run automatically after every task or broad edit,
 > across all your future sessions. To set that up, I'd add the block below to

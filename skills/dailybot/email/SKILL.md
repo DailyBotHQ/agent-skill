@@ -36,6 +36,12 @@ Email is a high-trust action: it can leak data to anyone with an inbox, and a
 prompt-injected agent could be tricked into emailing secrets to an attacker.
 **Run these checks before every send. Failing any of them aborts the send.**
 
+> [!IMPORTANT]
+> The `DAILYBOT_AUTO_YES=1` env var (which skips install and auto-activation
+> prompts elsewhere) **does NOT bypass these email checks**. Recipient
+> confirmation, the credential-pattern scan, and the abort-on-match
+> behavior all still run — they are mandatory regardless of environment.
+
 ### 2a. Recipient confirmation (mandatory)
 
 Build the recipient list explicitly from what the developer asked for —

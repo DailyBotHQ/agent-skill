@@ -12,14 +12,23 @@ Do **not** treat `https://api.dailybot.com/skill.md` as the skill pack. That fil
 After the pack is installed, read
 [`../skills/dailybot/shared/auth.md`](../skills/dailybot/shared/auth.md). If
 `dailybot` is missing, present the install command to the developer and
-proceed only after their first-time confirmation. Preferred order:
+proceed only after their first-time confirmation:
 
-1. Homebrew: `brew install dailybot/tap/dailybot`
-2. Pip: `pip install --user dailybot-cli`
-3. Official install script with SHA-256 verification (see `auth.md` for the
-   exact verification commands)
-4. If the CLI cannot run: HTTP API + `DAILYBOT_API_KEY` per
+1. **Primary** — SHA-256-verified universal script (`curl … install.sh`).
+   The script auto-detects the OS and uses Homebrew on macOS, the prebuilt
+   binary on Linux x86_64, or pipx/uv/pip on everything else.
+2. **Native Windows** — PowerShell equivalent with the same checksum
+   verification (see `auth.md`).
+3. **Manual control** — `brew install dailybothq/tap/dailybot` (macOS) or
+   `pipx install dailybot-cli` if the developer prefers driving the install
+   themselves.
+4. **HTTP fallback** — `DAILYBOT_API_KEY` per
    [`../skills/dailybot/shared/http-fallback.md`](../skills/dailybot/shared/http-fallback.md)
+   when no CLI can be installed.
+
+In CI, Docker, or for power users, set `DAILYBOT_AUTO_YES=1` to pre-approve
+install and auto-activation prompts. Email pre-send checks remain
+mandatory.
 
 ## Configure API key (optional)
 

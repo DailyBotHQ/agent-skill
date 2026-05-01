@@ -24,7 +24,7 @@ The `documentation_url` in frontmatter points to `https://api.dailybot.com/skill
 - **skills.sh / npx:** `npx skills add DailyBotHQ/agent-skill` from any supported agent.
 - **Do not** treat downloading only `api.dailybot.com/skill.md` as a full install — agents need the complete repository or registry install.
 
-**Dailybot CLI:** Before any API call, ensure the CLI exists (`command -v dailybot`). If missing, follow the consent flow in [`shared/auth.md`](shared/auth.md) — show the developer the install command and proceed only after their first-time confirmation. Preferred order: Homebrew (macOS), pip (cross-platform), official install script with SHA-256 verification (Linux fallback), HTTP API with `DAILYBOT_API_KEY` if the CLI cannot run.
+**Dailybot CLI:** Before any API call, ensure the CLI exists (`command -v dailybot`). If missing, follow the consent flow in [`shared/auth.md`](shared/auth.md) — the universal install script (`curl … install.sh` with SHA-256 verification) handles macOS / Linux / WSL / Docker / CI by auto-detecting the OS internally. Native Windows users get a PowerShell variant. `DAILYBOT_AUTO_YES=1` skips the interactive prompt for CI and power users. HTTP API with `DAILYBOT_API_KEY` is the last-resort fallback when no CLI can run.
 
 ---
 

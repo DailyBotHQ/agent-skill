@@ -75,34 +75,15 @@ do not re-prompt for the rest of the session.
 command -v dailybot
 ```
 
-If not found, pick **one** install method (preferred order below) and ask
-for approval before running it.
+The CLI ships **one universal install script** that auto-detects the OS and
+chooses the right strategy (Homebrew on macOS, prebuilt binary on Linux
+x86_64, pipx/uv/pip elsewhere). Don't surface alternatives by default — the
+script handles them.
 
-### 1a. Homebrew (preferred — macOS / Linuxbrew)
-
-```bash
-brew install dailybot/tap/dailybot
-```
-
-Easy uninstall: `brew uninstall dailybot`.
-
-### 1b. Pip (cross-platform, no root required)
+### 1a. Primary path — SHA-256-verified script (Linux, macOS, WSL, Docker, CI)
 
 ```bash
-pip install --user dailybot-cli
-```
-
-Try `pip3`, `python3 -m pip install --user dailybot-cli`, or
-`python3 -m pip install dailybot-cli` as needed. Easy uninstall:
-`pip uninstall dailybot-cli`.
-
-### 1c. Official install script with SHA-256 verification (Linux fallback)
-
-Only use this when neither of the above is available, and **only after
-verifying the script's SHA-256** against the published value:
-
-```bash
-curl -sSL https://cli.dailybot.com/install.sh -o /tmp/dailybot-install.sh
+curl -sSL https://cli.dailybot.com/install.sh        -o /tmp/dailybot-install.sh
 curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
 ( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) || {
   echo "SHA-256 verification failed — refusing to run install.sh." >&2
@@ -111,18 +92,38 @@ curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh
 bash /tmp/dailybot-install.sh
 ```
 
-If `install.sh.sha256` is unreachable, do **not** run the script.
+If `install.sh.sha256` is unreachable, warn the human and offer to (a) run
+the unverified script with their explicit additional consent, or (b) fall
+through to the HTTP API.
 
-### 1d. System package managers (only with explicit sudo approval)
+If `DAILYBOT_AUTO_YES=1` is set, treat install consent as already given and
+run the verified install command without an interactive prompt. The SHA-256
+check still runs.
 
-When the developer can approve elevated installs:
+### 1b. Native Windows (PowerShell)
 
-- Debian/Ubuntu: `sudo apt install dailybot` *(when published)*
-- Fedora/RHEL:   `sudo dnf install dailybot` *(when published)*
+```powershell
+$expected = (Invoke-RestMethod https://cli.dailybot.com/install.ps1.sha256).Trim()
+$script   = Invoke-RestMethod https://cli.dailybot.com/install.ps1
+$bytes    = [System.Text.Encoding]::UTF8.GetBytes($script)
+$actual   = (Get-FileHash -Algorithm SHA256 -InputStream ([System.IO.MemoryStream]::new($bytes))).Hash
+if ($actual -ne $expected) { throw "SHA-256 mismatch — refusing to run install.ps1" }
+Invoke-Expression $script
+```
 
-Do not loop through package managers without permission.
+If the developer is on WSL or Git Bash, prefer the bash path (1a) — broader
+testing coverage.
 
-### 1e. If the CLI cannot be installed
+### 1c. Manual control (developer prefers their own package manager)
+
+Both produce the same `dailybot` binary as the script:
+
+- macOS: `brew install dailybothq/tap/dailybot`
+- Cross-platform Python: `pipx install dailybot-cli` or `pip install --user dailybot-cli`
+
+Use these only when the developer says they prefer their own toolchain.
+
+### 1d. If the CLI cannot be installed
 
 Stop trying. Use the **HTTP API** path below with `DAILYBOT_API_KEY`. Ask the
 human to generate a key at DailyBot → Settings → API Keys:

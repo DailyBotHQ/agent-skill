@@ -4,6 +4,32 @@ All notable changes to the DailyBot agent skill pack are documented in this
 file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] — 2026-05-01
+
+### Changed
+
+- **CLI install ordering corrected.** The `cli.dailybot.com/install.sh`
+  script auto-detects the OS internally (Homebrew on macOS, prebuilt binary
+  on Linux x86_64, pipx/uv/pip elsewhere), so the SHA-256-verified
+  `curl … install.sh` flow is now documented as the **primary**
+  cross-platform path instead of being demoted to a fallback. Brew and pip
+  are listed only as manual-control alternatives. This restores universal
+  coverage (macOS, Linux, WSL, Docker, CI) without compromising the
+  verification + consent guarantees added in 1.0.0.
+- Added a Native Windows install path using PowerShell (`Invoke-RestMethod`
+  + `Get-FileHash` checksum verification). Prefers WSL/Git Bash when the
+  developer has either available.
+
+### Added
+
+- `DAILYBOT_AUTO_YES=1` environment variable. When set, the skill skips the
+  interactive consent prompt for CLI install and for the auto-activation
+  trigger write — the SHA-256 verification still runs. Intended for CI,
+  Docker, and developers who have already audited the skill internally.
+  **Email pre-send checks (recipient confirmation + secret-pattern scan)
+  are NOT bypassed by this variable** — they remain mandatory regardless of
+  environment.
+
 ## [1.0.0] — 2026-04-30
 
 First public release on the open Agent Skills standard. Distributable via

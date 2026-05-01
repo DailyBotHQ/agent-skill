@@ -112,14 +112,43 @@ The skill never installs anything without showing you the command and asking
 for confirmation **the first time** in a session. After you confirm once,
 later invocations in the same session do not re-prompt.
 
-| Binary | Default install method | Uninstall |
-|--------|------------------------|-----------|
-| `dailybot` CLI (macOS, Linuxbrew) | `brew install dailybot/tap/dailybot` | `brew uninstall dailybot` |
-| `dailybot` CLI (cross-platform) | `pip install --user dailybot-cli` | `pip uninstall dailybot-cli` |
-| `dailybot` CLI (Linux fallback) | SHA-256-verified script from `https://cli.dailybot.com/install.sh` | Uninstall command printed by the install script |
+The CLI ships **one universal install script** that auto-detects your OS:
+
+| OS | What `install.sh` does internally |
+|----|-----------------------------------|
+| macOS | `brew install dailybothq/tap/dailybot` |
+| Linux x86_64 | Downloads the prebuilt binary released on GitHub |
+| Linux ARM / Windows / fallback | `pipx install dailybot-cli` (or `uv tool install`, or `pip install --user`) |
+
+So the canonical install command on every system is:
+
+```bash
+curl -sSL https://cli.dailybot.com/install.sh        -o /tmp/dailybot-install.sh
+curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
+( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) && bash /tmp/dailybot-install.sh
+```
+
+For native Windows (no WSL / Git Bash), the equivalent PowerShell command is
+documented in `skills/dailybot/shared/auth.md`. If you'd rather drive the
+install yourself, `brew install dailybothq/tap/dailybot` (macOS) or
+`pipx install dailybot-cli` (cross-platform) produce the same `dailybot`
+binary.
 
 The skill **declines** to run the install script if its published checksum
-(`https://cli.dailybot.com/install.sh.sha256`) is unreachable.
+(`https://cli.dailybot.com/install.sh.sha256`) is unreachable, and offers to
+either skip the install (use HTTP API) or proceed unverified after explicit
+extra consent.
+
+### Skipping consent prompts (CI, Docker, power users)
+
+Set `DAILYBOT_AUTO_YES=1` in your environment to pre-approve install and
+auto-activation prompts for the session. The SHA-256 verification still
+runs. **Email pre-send checks are NOT bypassed by this variable** — they
+are mandatory.
+
+```bash
+export DAILYBOT_AUTO_YES=1
+```
 
 ### Files it may create or modify
 

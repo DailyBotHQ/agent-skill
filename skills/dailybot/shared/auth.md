@@ -21,7 +21,7 @@ If `dailybot` is found, verify it runs:
 dailybot --version 2>&1 || dailybot status --auth 2>&1
 ```
 
-### If the CLI is not installed — confirm before installing
+### If the CLI is not installed — confirm, then run the universal installer
 
 Installing software on the developer's machine is a security-relevant action.
 The first time you need to install the CLI in a session, **show the proposed
@@ -29,59 +29,76 @@ command and proceed only after explicit confirmation**. Do not re-prompt for
 later invocations in the same session — once the developer has confirmed,
 treat that as session-wide consent.
 
-Pick **one** install path from the table below based on what is available on
-the developer's system, then surface this prompt:
-
-> "I'd like to install the Dailybot CLI so I can report progress. The
-> command I'll run is:
+> [!NOTE]
+> The Dailybot CLI ships **one universal install script** that auto-detects
+> the OS and chooses the right strategy internally:
+> - **macOS** → `brew install dailybothq/tap/dailybot`
+> - **Linux x86_64** → prebuilt binary released on GitHub
+> - **Linux ARM / others** → `pipx` → `uv` → `pip` → `pip --user`
 >
-> ```
-> <selected command>
+> You don't pick a method. The script does. Your job is to verify integrity
+> before executing it.
+
+#### Primary path: SHA-256-verified script (Linux, macOS, WSL, Docker, CI)
+
+Show the developer this prompt the first time:
+
+> "I'd like to install the Dailybot CLI. The command I'll run is:
+>
+> ```bash
+> curl -sSL https://cli.dailybot.com/install.sh        -o /tmp/dailybot-install.sh
+> curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
+> ( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) && bash /tmp/dailybot-install.sh
 > ```
 >
-> This installs `dailybot` into your user directory. To uninstall later, run
-> the matching uninstall command listed in the README. **Should I proceed?**
-> (yes / no / show me another method)"
+> The script auto-detects your OS and uses Homebrew on macOS, the prebuilt
+> binary on Linux, or pip elsewhere. To uninstall later, follow the matching
+> uninstall command in the README. **Should I proceed?** (yes / no)"
 
-If the developer declines, switch to the **HTTP fallback** path below — do
-not loop through alternatives without permission.
+On confirmation, run the three commands. If the SHA-256 check fails, **abort**
+and warn the developer — do not run the script.
 
-#### Preferred install methods (in order)
+If `https://cli.dailybot.com/install.sh.sha256` returns a non-200 (the CDN
+hasn't published the checksum yet), warn the developer and offer two
+choices: (a) run the unverified script anyway with their explicit additional
+consent, or (b) skip CLI install and use the HTTP API path below.
 
-| Order | Platform | Install command | Why preferred |
-|-------|----------|-----------------|---------------|
-| 1 | macOS / Linuxbrew | `brew install dailybot/tap/dailybot` | Signed formula, easy uninstall (`brew uninstall dailybot`) |
-| 2 | Cross-platform Python | `pip install --user dailybot-cli` | No root, easy uninstall (`pip uninstall dailybot-cli`), works in containers |
-| 3 | Debian/Ubuntu (with sudo approval) | `sudo apt install dailybot` *(when published)* | System package manager — only with explicit approval |
-| 4 | Fedora/RHEL (with sudo approval) | `sudo dnf install dailybot` *(when published)* | Same — explicit approval required |
+#### Native Windows (PowerShell)
 
-Try `pip3`, `python3 -m pip install --user dailybot-cli`, or
-`python3 -m pip install dailybot-cli` as needed when the plain `pip` form
-fails.
+For developers on native Windows without WSL or Git Bash:
 
-#### Fallback: official install script with SHA-256 verification
-
-Only use this when none of the methods above is available. **Verify the
-script's SHA-256 against the published value before executing.**
-
-```bash
-# 1. Download the script and the published checksum.
-curl -sSL https://cli.dailybot.com/install.sh -o /tmp/dailybot-install.sh
-curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
-
-# 2. Verify the checksum matches.
-( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) || {
-  echo "SHA-256 verification failed — refusing to run install.sh." >&2
-  exit 1
-}
-
-# 3. Inspect the script if you'd like, then run it.
-bash /tmp/dailybot-install.sh
+```powershell
+$expected = (Invoke-RestMethod https://cli.dailybot.com/install.ps1.sha256).Trim()
+$script   = Invoke-RestMethod https://cli.dailybot.com/install.ps1
+$bytes    = [System.Text.Encoding]::UTF8.GetBytes($script)
+$actual   = (Get-FileHash -Algorithm SHA256 -InputStream ([System.IO.MemoryStream]::new($bytes))).Hash
+if ($actual -ne $expected) { throw "SHA-256 mismatch — refusing to run install.ps1" }
+Invoke-Expression $script
 ```
 
-If `https://cli.dailybot.com/install.sh.sha256` is unreachable, **do not run
-the install script** — fall through to the HTTP API path below and let the
-developer install the CLI manually when they are ready.
+If the developer is on WSL or Git Bash, prefer the bash path above — it has
+broader testing coverage.
+
+#### Manual control (developer prefers their own package manager)
+
+If the developer would rather install via their own toolchain instead of the
+script, both produce the same `dailybot` binary:
+
+- macOS: `brew install dailybothq/tap/dailybot`
+- Cross-platform Python: `pipx install dailybot-cli` or `pip install --user dailybot-cli`
+
+Use these when the developer says "I'd rather use brew/pipx" or when running
+in an environment that already has one of them set up. Don't surface them as
+the default — the universal script covers more cases and gets the same
+result.
+
+#### Skipping consent prompts (CI / Docker / power users)
+
+If `DAILYBOT_AUTO_YES=1` is set in the environment, treat install consent as
+already given — run the verified install command directly without the
+interactive prompt. The SHA-256 check still runs and still aborts on
+mismatch. **`DAILYBOT_AUTO_YES` does NOT skip email confirmations** — those
+are mandatory regardless.
 
 After any install attempt, re-check:
 
