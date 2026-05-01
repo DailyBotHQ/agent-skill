@@ -8,16 +8,28 @@
 #   ./setup --host cursor   # explicit: Cursor
 #   ./setup --host codex    # explicit: OpenAI Codex
 #   ./setup --host auto     # detect all installed agents
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PACK_DIR="$SCRIPT_DIR/skills/dailybot"
 PACK_NAME="dailybot"
+
+if [ ! -d "$PACK_DIR" ]; then
+  echo "Pack directory not found at $PACK_DIR" >&2
+  echo "This script must run from the root of the agent-skill repository." >&2
+  exit 1
+fi
 
 # ─── Parse flags ──────────────────────────────────────────────
 HOST=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --host) [ -z "$2" ] && echo "Missing value for --host" >&2 && exit 1; HOST="$2"; shift 2 ;;
+    --host)
+      if [ $# -lt 2 ] || [ -z "${2:-}" ]; then
+        echo "Missing value for --host" >&2
+        exit 1
+      fi
+      HOST="$2"; shift 2 ;;
     --host=*) HOST="${1#--host=}"; shift ;;
     -h|--help)
       echo "Usage: ./setup.sh [--host claude|cursor|codex|windsurf|copilot|cline|gemini|auto]"
@@ -64,15 +76,15 @@ link_agent() {
 
   # Ensure the pack directory itself is accessible.
   # If the repo was cloned directly into the skills dir (e.g. ~/.cursor/skills/dailybot/),
-  # no pack-level symlink is needed. Otherwise, create one.
+  # no pack-level symlink is needed. Otherwise, create one pointing at PACK_DIR.
   local pack_target="$skills_dir/$PACK_NAME"
-  if [ ! -e "$pack_target" ] && [ "$SCRIPT_DIR" != "$pack_target" ]; then
-    ln -snf "$SCRIPT_DIR" "$pack_target"
-    echo "  $PACK_NAME -> $SCRIPT_DIR"
+  if [ ! -e "$pack_target" ] && [ "$PACK_DIR" != "$pack_target" ]; then
+    ln -snf "$PACK_DIR" "$pack_target"
+    echo "  $PACK_NAME -> $PACK_DIR"
   fi
 
   for skill in "${SKILLS[@]}"; do
-    local skill_dir="$SCRIPT_DIR/$skill"
+    local skill_dir="$PACK_DIR/$skill"
     if [ -f "$skill_dir/SKILL.md" ]; then
       local link_name="dailybot-$skill"
       local target="$skills_dir/$link_name"
@@ -104,17 +116,22 @@ detect_agents() {
   [ -d "$HOME/.gemini" ]                   && found+=("gemini")
 
   # Deduplicate
-  printf '%s\n' "${found[@]}" | sort -u
+  if [ ${#found[@]} -gt 0 ]; then
+    printf '%s\n' "${found[@]}" | sort -u
+  fi
 }
 
 # ─── Main ─────────────────────────────────────────────────────
 echo "Dailybot skill pack setup"
-echo "Pack directory: $SCRIPT_DIR"
+echo "Pack directory: $PACK_DIR"
 echo ""
 
 if [ -z "$HOST" ] || [ "$HOST" = "auto" ]; then
-  agents=($(detect_agents))
-  if [ ${#agents[@]} -eq 0 ]; then
+  agents=()
+  while IFS= read -r line; do
+    [ -n "$line" ] && agents+=("$line")
+  done < <(detect_agents)
+  if [ "${#agents[@]}" -eq 0 ]; then
     echo "No known agent platforms detected."
     echo "Install the pack manually by cloning into your agent's skill directory."
     echo "See README.md for paths."
