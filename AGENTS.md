@@ -26,8 +26,10 @@ the same instructions other agents do.
 |----------|----------|
 | User-facing README | [README.md](README.md) |
 | Security policy | [SECURITY.md](SECURITY.md) |
-| Public CLI/HTTP API reference (mirrored at `api.dailybot.com/skill.md`) | [docs/skill.md](docs/skill.md) |
-| OpenClaw notes | [docs/openclaw.md](docs/openclaw.md) |
+| Public CLI/HTTP API reference (mirrored at `api.dailybot.com/skill.md`) | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) |
+| OpenClaw notes | [docs/OPENCLAW.md](docs/OPENCLAW.md) |
+| Design decisions (why the layout is the way it is) | [docs/DESIGN.md](docs/DESIGN.md) |
+| Adding a new sub-skill | [docs/SUB_SKILL_GUIDE.md](docs/SUB_SKILL_GUIDE.md) |
 | Contribution guide | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Changelog | [CHANGELOG.md](CHANGELOG.md) |
 | Router meta-skill | [skills/dailybot/SKILL.md](skills/dailybot/SKILL.md) |
@@ -354,7 +356,7 @@ that's both validation and documentation.
 11. Push to `main` without running `shellcheck` and `bats tests/` locally
 12. Update `install.sh` in `DailyBotHQ/cli` without also publishing the new `install.sh.sha256` to the CDN — the skill will refuse to install
 13. Add a new sub-skill folder without giving it its own `SKILL.md` with full frontmatter
-14. Send a PR that only touches `docs/skill.md` (the public API ref) without mirroring the change to the matching `skills/dailybot/**/SKILL.md` — they describe the same surface
+14. Send a PR that only touches `docs/API_REFERENCE.md` (the public API ref) without mirroring the change to the matching `skills/dailybot/**/SKILL.md` — they describe the same surface
 15. Hardcode literal SHA-256 hashes anywhere in this repo — they belong on the CDN, generated at release time
 
 ### DO
@@ -369,7 +371,7 @@ that's both validation and documentation.
 8. Use the skill itself to report your own progress — eat the dog food
 9. Test `setup.sh` manually with `--host claude` after touching it
 10. Test `context.sh` in three scenarios: regular dir, `.dailybot/disabled` present, `DAILYBOT_AGENT_TOOL` set
-11. Mirror changes between `docs/skill.md` and the runtime SKILL.md files when public surface evolves
+11. Mirror changes between `docs/API_REFERENCE.md` and the runtime SKILL.md files when public surface evolves
 12. Generate the install script SHA-256 in CI of `DailyBotHQ/cli`, never by hand
 13. Use "Dailybot" in user-visible text
 14. Preserve the consent flow philosophy when touching auth.md, Step 0 of report, or email/
