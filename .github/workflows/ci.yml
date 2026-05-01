@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck on shipped scripts
+        run: |
+          shellcheck setup.sh skills/dailybot/shared/context.sh
+          # Also check repo-dev scripts
+          shellcheck scripts/*.sh
+
+  context-sh-smoke:
+    name: context.sh smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Emits valid JSON in a regular directory
+        run: |
+          OUTPUT=$(bash skills/dailybot/shared/context.sh)
+          echo "Output: $OUTPUT"
+          echo "$OUTPUT" | python3 -c 'import json,sys; json.loads(sys.stdin.read())'
+
+      - name: Respects .dailybot/disabled marker (silent exit)
+        run: |
+          mkdir -p .dailybot && touch .dailybot/disabled
+          OUTPUT=$(bash skills/dailybot/shared/context.sh)
+          rm -rf .dailybot
+          if [ -n "$OUTPUT" ]; then
+            echo "FAIL: expected empty output, got: $OUTPUT"
+            exit 1
+          fi
+          echo "OK: opt-out silenced output"
+
+      - name: Respects DAILYBOT_AGENT_TOOL override
+        run: |
+          export DAILYBOT_AGENT_TOOL="my-test-agent"
+          OUTPUT=$(bash skills/dailybot/shared/context.sh)
+          echo "Output: $OUTPUT"
+          echo "$OUTPUT" | grep -q '"agent_tool":"my-test-agent"' || {
+            echo "FAIL: env override not honored"
+            exit 1
+          }
+
+  bats-tests:
+    name: bats tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats-core
+        run: sudo apt-get update && sudo apt-get install -y bats
+      - run: bats tests/
+
+  frontmatter-validation:
+    name: SKILL.md frontmatter validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - run: python3 scripts/validate-frontmatter.py
+
+  bash-3-2-compat:
+    name: bash 3.2 compatibility (macOS default)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm bash version
+        run: bash --version
+      - name: setup.sh --help runs cleanly
+        run: bash setup.sh --help
+      - name: setup.sh --host claude in dry mode
+        run: |
+          # Don't actually create symlinks in CI — just exercise the codepath
+          # by pointing HOME at a temp dir.
+          export HOME=$(mktemp -d)
+          mkdir -p "$HOME/.claude"
+          bash setup.sh --host claude
+          test -L "$HOME/.claude/skills/dailybot" || (echo "FAIL: pack symlink missing" && exit 1)
+          test -L "$HOME/.claude/skills/dailybot-report" || (echo "FAIL: report symlink missing" && exit 1)
+      - name: context.sh runs on bash 3.2
+        run: bash skills/dailybot/shared/context.sh
+
+  markdown-links:
+    name: Markdown link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: '.github/markdown-link-check.json'
+          # Only check repo-internal links by default (external can be flaky)
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'

@@ -4,6 +4,43 @@ All notable changes to the DailyBot agent skill pack are documented in this
 file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-05-01
+
+### Added (repository-development infrastructure — does not affect installed skill)
+
+- `AGENTS.md` at the repo root with the canonical contributor guide for AI
+  agents working on this repository, plus a `CLAUDE.md` symlink pointing at
+  it. Documents what ships at runtime vs. what stays as dev infrastructure,
+  the public surface that must not be broken, and the consent-flow
+  philosophy behind every behavior change.
+- `CONTRIBUTING.md` with a friendlier human counterpart to AGENTS.md.
+- GitHub Actions CI in `.github/workflows/ci.yml` covering: shellcheck on
+  every shipped shell script, JSON-validity smoke tests on `context.sh`
+  including the `.dailybot/disabled` opt-out and `DAILYBOT_AGENT_TOOL`
+  override paths, bats-core tests, frontmatter validation, bash 3.2
+  compatibility on macOS runners, and markdown link checking.
+- `tests/` directory with bats-core tests for `context.sh` (10 cases) and
+  `setup.sh` (7 cases). Tests use isolated temp dirs and a fake `HOME` so
+  they don't touch the contributor's real agent installations.
+- `scripts/verify-cdn.sh` — probes `cli.dailybot.com` to confirm both
+  `install.sh` and `install.sh.sha256` are reachable and that the
+  checksum matches the script. Optionally checks `install.ps1` and its
+  checksum if Windows native support has been published.
+- `scripts/validate-frontmatter.py` — schema check that fails CI if any
+  `SKILL.md` introduces `name: dailybot_*` (snake_case), the legacy
+  `homepage:` field, an unquoted version, or any of the other deviations
+  from the conventions in AGENTS.md.
+- `.github/ISSUE_TEMPLATE/` with bug-report and feature-request templates
+  that prompt for the agent + OS + install method context we need to
+  triage reports.
+- `.github/PULL_REQUEST_TEMPLATE.md` with the same pre-merge checklist
+  the AGENTS.md documents inline, so contributors can verify before
+  requesting review.
+
+None of these files ship to end users. Only `skills/dailybot/` is included
+when the skill is installed via `npx skills add`, `openclaw skills install`,
+or `git clone + setup.sh`.
+
 ## [1.0.1] — 2026-05-01
 
 ### Changed

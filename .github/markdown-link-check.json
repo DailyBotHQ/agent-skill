@@ -1,0 +1,24 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https?://api\\.dailybot\\.com"
+    },
+    {
+      "pattern": "^https?://cli\\.dailybot\\.com"
+    },
+    {
+      "pattern": "^https?://www\\.dailybot\\.com"
+    },
+    {
+      "pattern": "^https?://(www\\.)?openclaw\\."
+    },
+    {
+      "pattern": "^https?://skills\\.sh"
+    }
+  ],
+  "timeout": "10s",
+  "retryOn429": true,
+  "retryCount": 3,
+  "fallbackRetryDelay": "5s",
+  "aliveStatusCodes": [200, 206, 301, 302, 303, 304, 307, 308, 403]
+}
