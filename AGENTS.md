@@ -4,7 +4,7 @@
 Cursor AI, OpenAI Codex, Gemini CLI, GitHub Copilot, others) that **edits
 this repository**. This file is for contributors, not for end users of the
 skill. Notice we write **"Dailybot"** (lowercase 'b') for user-facing content
-and documentation — "DailyBot" (capital 'B') is the legacy spelling and must
+and documentation — "Dailybot" (capital 'B') is the legacy spelling and must
 not appear in new user-visible text.
 
 > [!IMPORTANT]
@@ -126,10 +126,10 @@ bash scripts/verify-cdn.sh
 All code, comments, documentation, and commit messages MUST be in English.
 This is a public open-source repo consumed worldwide.
 
-### 2. Brand spelling: "Dailybot", not "DailyBot"
+### 2. Brand spelling: "Dailybot", not "Dailybot"
 
 In **user-facing text** the product is **Dailybot** (lowercase 'b'). The
-legacy spelling "DailyBot" must not appear in new user-visible content
+legacy spelling "Dailybot" must not appear in new user-visible content
 (SKILL.md descriptions, README sections, prompts the skill emits, error
 messages users see).
 
@@ -352,7 +352,7 @@ that's both validation and documentation.
 7. Modify a `skills/dailybot/` file without updating `CHANGELOG.md` and bumping the version
 8. Break the `<!-- dailybot-auto-activation -->` markers — users grep for them to uninstall
 9. Change the HTTP endpoint shapes or CLI flag names without a major version bump
-10. Use "DailyBot" (capital 'B') in new user-visible content — use "Dailybot"
+10. Use "Dailybot" (capital 'B') in new user-visible content — use "Dailybot"
 11. Push to `main` without running `shellcheck` and `bats tests/` locally
 12. Update `install.sh` in `DailyBotHQ/cli` without also publishing the new `install.sh.sha256` to the CDN — the skill will refuse to install
 13. Add a new sub-skill folder without giving it its own `SKILL.md` with full frontmatter

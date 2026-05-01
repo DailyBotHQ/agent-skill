@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you believe you have found a security vulnerability in the DailyBot agent
+If you believe you have found a security vulnerability in the Dailybot agent
 skill pack, please report it privately rather than opening a public issue.
 
 **Email:** security@dailybot.com
@@ -32,7 +32,7 @@ The following are in scope for security reports:
 The following are tracked separately and not handled here:
 
 - The `dailybot` CLI itself (report at <https://github.com/DailyBotHQ/dailybot-cli>)
-- The DailyBot API (`api.dailybot.com`) — report via the email above
+- The Dailybot API (`api.dailybot.com`) — report via the email above
 - Third-party agent harnesses (Claude Code, Cursor, etc.) — report upstream
 - Issues caused by user-modified copies of the skill that drift from this repo
 
