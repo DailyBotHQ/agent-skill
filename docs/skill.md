@@ -19,41 +19,33 @@ DailyBot is the visibility and orchestration layer for modern teams where humans
 
 ### Install the Skill Pack
 
+The fastest path is the cross-agent installer:
+
 ```bash
-# Claude Code
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.claude/skills/dailybot
+npx skills add DailyBotHQ/agent-skill
+```
 
-# Cursor
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.cursor/skills/dailybot
+Or clone manually + run `setup.sh`:
 
-# OpenAI Codex
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.codex/skills/dailybot
+```bash
+git clone https://github.com/DailyBotHQ/agent-skill.git ~/dailybot-skill
+cd ~/dailybot-skill
+./setup.sh
+```
 
-# Windsurf
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.codeium/windsurf/skills/dailybot
+For OpenClaw:
 
-# GitHub Copilot
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.copilot/skills/dailybot
-
-# Cline
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.cline/skills/dailybot
-
-# Gemini CLI
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.gemini/skills/dailybot
-
-# OpenClaw
+```bash
 openclaw skills install dailybot
 ```
 
-Then create sub-skill symlinks for independent discovery:
+After installation, read `skills/dailybot/SKILL.md` in the skill pack — it
+routes to the right sub-skill based on intent. **If the skill pack is
+already installed, follow it instead of this file.**
 
-```bash
-cd <skill-path> && ./setup.sh
-```
-
-After installation, read the root `SKILL.md` in the skill pack — it routes to the right sub-skill based on intent. **If the skill pack is already installed, follow it instead of this file.**
-
-If you cannot install the skill pack (sandboxed environment, CI pipeline, serverless function, or custom integration), continue with this file — it has everything you need.
+If you cannot install the skill pack (sandboxed environment, CI pipeline,
+serverless function, or custom integration), continue with this file — it
+has everything you need.
 
 ---
 
@@ -74,45 +66,73 @@ Everything else — CLI installation, agent profile creation, choosing an agent 
 
 ## Step 1 — Install the DailyBot CLI
 
-The CLI is the preferred way to interact with DailyBot. **Install it automatically** when `dailybot` is not on PATH. Do not ask the human for permission to run a normal (non-root) install.
+The CLI is the preferred way to interact with DailyBot. The first time you
+need to install it in a session, **show the proposed command and proceed
+only after explicit confirmation from the human**. After they confirm once,
+do not re-prompt for the rest of the session.
 
 ```bash
 command -v dailybot
 ```
 
-If not found, install using this order:
+If not found, pick **one** install method (preferred order below) and ask
+for approval before running it.
 
-### 1a. Official install script (preferred — prebuilt binary, fastest on Linux/macOS)
-
-```bash
-curl -sSL https://cli.dailybot.com/install.sh | bash
-```
-
-Re-check: `command -v dailybot`
-
-### 1b. Pip fallback (when the binary fails — e.g. GLIBC mismatch)
+### 1a. Homebrew (preferred — macOS / Linuxbrew)
 
 ```bash
-pip install dailybot-cli
+brew install dailybot/tap/dailybot
 ```
 
-Try `pip3`, `python3 -m pip install --user dailybot-cli`, or `python3 -m pip install dailybot-cli` as needed.
+Easy uninstall: `brew uninstall dailybot`.
 
-Re-check: `command -v dailybot`
+### 1b. Pip (cross-platform, no root required)
 
-### 1c. Escalation (only with user approval)
+```bash
+pip install --user dailybot-cli
+```
 
-If pip is missing, you may suggest `sudo apt install python3-pip` (or `dnf`/`yum` equivalent) — but only if the human can approve elevated installs. Do not loop through system package managers.
+Try `pip3`, `python3 -m pip install --user dailybot-cli`, or
+`python3 -m pip install dailybot-cli` as needed. Easy uninstall:
+`pip uninstall dailybot-cli`.
 
-### 1d. If the CLI cannot be installed
+### 1c. Official install script with SHA-256 verification (Linux fallback)
 
-Stop trying. Use the **HTTP API** path below with `DAILYBOT_API_KEY`. Ask the human to generate a key at DailyBot → Settings → API Keys:
+Only use this when neither of the above is available, and **only after
+verifying the script's SHA-256** against the published value:
+
+```bash
+curl -sSL https://cli.dailybot.com/install.sh -o /tmp/dailybot-install.sh
+curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
+( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) || {
+  echo "SHA-256 verification failed — refusing to run install.sh." >&2
+  exit 1
+}
+bash /tmp/dailybot-install.sh
+```
+
+If `install.sh.sha256` is unreachable, do **not** run the script.
+
+### 1d. System package managers (only with explicit sudo approval)
+
+When the developer can approve elevated installs:
+
+- Debian/Ubuntu: `sudo apt install dailybot` *(when published)*
+- Fedora/RHEL:   `sudo dnf install dailybot` *(when published)*
+
+Do not loop through package managers without permission.
+
+### 1e. If the CLI cannot be installed
+
+Stop trying. Use the **HTTP API** path below with `DAILYBOT_API_KEY`. Ask the
+human to generate a key at DailyBot → Settings → API Keys:
 
 ```bash
 export DAILYBOT_API_KEY="<their-key>"
 ```
 
-Sandboxed environments, CI, or minimal containers may never get a working CLI — HTTP fallback is expected there.
+Sandboxed environments, CI, or minimal containers may never get a working
+CLI — HTTP fallback is expected there.
 
 Full CLI documentation: https://pypi.org/project/dailybot-cli/
 

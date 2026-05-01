@@ -1,6 +1,14 @@
 # Dailybot Skill Pack
 
-Give your AI coding agent the ability to report progress, check for messages, send emails, and announce status — all through [Dailybot](https://www.dailybot.com). Your team sees what the agent accomplished, sends instructions, and stays coordinated across humans and agents.
+Give your AI coding agent the ability to report progress, check for messages,
+send emails, and announce status — all through [Dailybot](https://www.dailybot.com).
+Your team sees what the agent accomplished, sends instructions, and stays
+coordinated across humans and agents.
+
+- **License:** [MIT](LICENSE)
+- **Security policy:** [SECURITY.md](SECURITY.md)
+- **Changes:** [CHANGELOG.md](CHANGELOG.md)
+- **Format:** [Open Agent Skills](https://agentskills.io) standard
 
 ## Skills
 
@@ -8,130 +16,163 @@ Give your AI coding agent the ability to report progress, check for messages, se
 |-------|-------------|
 | **dailybot-report** | Send progress updates after completing meaningful work. Reports read like standup updates — no one can tell they came from an agent. |
 | **dailybot-messages** | Check for pending messages and instructions from the team. The "what should I work on next?" skill. |
-| **dailybot-email** | Send emails to any address via Dailybot. Notifications, summaries, follow-ups. |
+| **dailybot-email** | Send emails via Dailybot. Per-recipient first-use approval, mandatory pre-send confirmation, and a credential-pattern scan run before every send. |
 | **dailybot-health** | Announce agent online/offline status. For long-running or scheduled agents to stay visible and pick up instructions. |
 
-A root **dailybot** meta-skill acts as a router — it describes all capabilities and routes to the right sub-skill based on the developer's intent.
+A root **dailybot** meta-skill acts as a router — it describes all
+capabilities and routes to the right sub-skill based on the developer's
+intent.
 
-Each skill can be used independently or together. They share authentication and context detection through a common `shared/` directory.
-
-## Supported Agents
-
-| Agent | Global skill path |
-|-------|------------------|
-| **Claude Code** | `~/.claude/skills/dailybot/` |
-| **OpenClaw** | `<workspace>/skills/dailybot/` or `~/.openclaw/skills/` |
-| **Cursor** | `~/.cursor/skills/dailybot/` |
-| **OpenAI Codex** | `~/.codex/skills/dailybot/` |
-| **Windsurf** | `~/.codeium/windsurf/skills/dailybot/` |
-| **GitHub Copilot** | `~/.copilot/skills/dailybot/` |
-| **Cline** | `~/.cline/skills/dailybot/` |
-| **Gemini CLI** | `~/.gemini/skills/dailybot/` |
+Each skill can be used independently or together. They share authentication
+and context detection through a common `shared/` directory.
 
 ## Install
 
-### 1. Clone the skill pack
+### Option 1 — `npx skills` (cross-agent, recommended)
 
-Pick the path for your agent from the table above:
-
-```bash
-# Claude Code
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.claude/skills/dailybot
-
-# Cursor
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.cursor/skills/dailybot
-
-# OpenAI Codex
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.codex/skills/dailybot
-
-# Windsurf
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.codeium/windsurf/skills/dailybot
-
-# GitHub Copilot
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.copilot/skills/dailybot
-
-# Cline
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.cline/skills/dailybot
-
-# Gemini CLI
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.gemini/skills/dailybot
-```
-
-### 2. Run setup
-
-The setup script creates symlinks so each sub-skill is independently discoverable:
+The [skills.sh](https://skills.sh) CLI auto-detects your agent and installs
+the skill in the right place:
 
 ```bash
-cd ~/.cursor/skills/dailybot  # or whichever path you used
-./setup.sh
+npx skills add DailyBotHQ/agent-skill
 ```
 
-This auto-detects installed agents and creates symlinks like `dailybot-report`, `dailybot-messages`, `dailybot-email`, and `dailybot-health` alongside the main `dailybot` directory.
-
-To target a specific agent:
+To target a specific agent or list available skills first:
 
 ```bash
-./setup.sh --host claude
-./setup.sh --host codex
-./setup.sh --host auto    # detect all installed agents
+npx skills add DailyBotHQ/agent-skill --list
+npx skills add DailyBotHQ/agent-skill -a claude-code
 ```
 
-### 3. Invoke a skill
+### Option 2 — Git clone + setup script
 
-Open your IDE and mention Dailybot. The agent will route to the right skill:
+Pick the path for your agent, clone, then run `setup.sh`:
 
-- "Report this to Dailybot" → **dailybot-report**
-- "Do I have messages?" → **dailybot-messages**
-- "Email this to Alice" → **dailybot-email**
+| Agent | Default path |
+|-------|--------------|
+| Claude Code | `~/.claude/skills/dailybot/` |
+| Cursor | `~/.cursor/skills/dailybot/` |
+| OpenAI Codex | `~/.codex/skills/dailybot/` |
+| Windsurf | `~/.codeium/windsurf/skills/dailybot/` |
+| GitHub Copilot | `~/.copilot/skills/dailybot/` |
+| Cline | `~/.cline/skills/dailybot/` |
+| Gemini CLI | `~/.gemini/skills/dailybot/` |
+| OpenClaw | `<workspace>/skills/dailybot/` or `~/.openclaw/skills/` |
 
-Or invoke directly: `/dailybot_report`. The messages, email, and health skills activate autonomously — the agent uses them without you needing to ask.
+```bash
+git clone https://github.com/DailyBotHQ/agent-skill.git ~/dailybot-skill
+cd ~/dailybot-skill
+./setup.sh                # auto-detect installed agents
+./setup.sh --host claude  # or target one agent explicitly
+```
 
-On first use, the agent installs the Dailybot CLI if needed (official install script first, then pip; see `shared/auth.md`), then walks you through authentication (OTP login is preferred; API key or HTTP fallback when the CLI cannot run).
+`setup.sh` symlinks each sub-skill (`dailybot-report`, `dailybot-messages`,
+`dailybot-email`, `dailybot-health`) into the agent's skills directory so
+they're discoverable as independent slash commands.
 
-### OpenClaw
-
-OpenClaw has a native skill registry. Install the **full skill pack** — do not use `https://api.dailybot.com/skill.md` as a substitute for the pack. That URL is the **API reference** (curl + endpoints), not the repository with the router, `shared/`, and sub-skills.
+### Option 3 — OpenClaw native registry
 
 ```bash
 openclaw skills install dailybot
 ```
 
-Or clone [DailyBotHQ/agent-skill](https://github.com/DailyBotHQ/agent-skill) into `<workspace>/skills/dailybot/`.
+OpenClaw loads the pack natively on every eligible session — no trigger
+setup required. Configure the API key in `~/.openclaw/openclaw.json` per the
+example in `skills/dailybot/report/triggers.md`.
 
-No trigger setup needed — OpenClaw loads skills natively on every eligible session. On first Dailybot action, the agent should install the CLI automatically per `shared/auth.md` (no extra “may I install?” step for normal installs).
+### Invoke a skill
 
-The `homepage` field in each `SKILL.md` may still point to `https://api.dailybot.com/skill.md` for API documentation — that is intentional; it does not mean “install from this URL only.”
+Once installed, mention Dailybot in your IDE and the agent will route to the
+right sub-skill:
 
-### Update
+- "Report this to Dailybot" → **dailybot-report**
+- "Do I have messages?" → **dailybot-messages**
+- "Email this to Alice" → **dailybot-email**
+
+Or invoke directly: `/dailybot_report`. The messages, email, and health
+skills are agent-only — the agent uses them autonomously without a slash
+command.
+
+On first use, the agent shows the proposed CLI install command and asks for
+your confirmation before installing anything. After confirmation, it walks
+you through Dailybot login (OTP preferred; API key or HTTP fallback when the
+CLI cannot run).
+
+---
+
+## What this skill does to your environment
+
+For full transparency, this section enumerates every external action the
+skill takes. Use this to evaluate whether the skill is acceptable for your
+environment before installing it.
+
+### Binaries it may install
+
+The skill never installs anything without showing you the command and asking
+for confirmation **the first time** in a session. After you confirm once,
+later invocations in the same session do not re-prompt.
+
+| Binary | Default install method | Uninstall |
+|--------|------------------------|-----------|
+| `dailybot` CLI (macOS, Linuxbrew) | `brew install dailybot/tap/dailybot` | `brew uninstall dailybot` |
+| `dailybot` CLI (cross-platform) | `pip install --user dailybot-cli` | `pip uninstall dailybot-cli` |
+| `dailybot` CLI (Linux fallback) | SHA-256-verified script from `https://cli.dailybot.com/install.sh` | Uninstall command printed by the install script |
+
+The skill **declines** to run the install script if its published checksum
+(`https://cli.dailybot.com/install.sh.sha256`) is unreachable.
+
+### Files it may create or modify
+
+| File | Why | When | How to remove |
+|------|-----|------|---------------|
+| `~/.dailybot/config` | Stores API key when the developer chooses `dailybot config key=...` | After login | `rm ~/.dailybot/config` |
+| `~/.dailybot/email-approvals.json` | Caches addresses you have approved for `dailybot-email` | First time you confirm a recipient | `rm ~/.dailybot/email-approvals.json` |
+| `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md`, `~/.cline/.clinerules`, `~/.agents/AGENTS.md` | Auto-activation trigger (only with explicit consent in Step 0 of the report skill) | First time you accept the auto-activation prompt | Delete the block between `<!-- dailybot-auto-activation: BEGIN -->` and `<!-- dailybot-auto-activation: END -->` |
+| `~/.cursor/rules/dailybot.mdc`, `.windsurf/rules/dailybot.md` | Auto-activation rule (file is the marker — same opt-in flow) | First time you accept the auto-activation prompt | `rm` the file |
+
+The skill does **not** modify any file in your project repos other than
+respecting `.dailybot/disabled` (read-only).
+
+### Network calls it makes
+
+All outbound calls go to `api.dailybot.com` over HTTPS:
+
+| Endpoint | Triggered by | Data sent |
+|----------|--------------|-----------|
+| `POST /v1/agent-reports/` | `dailybot-report` skill | `agent_name`, `content`, `structured` (optional), `metadata` (repo name, branch, agent tool, agent name, model) |
+| `POST /v1/agent-health/` | `dailybot-health` skill | `agent_name`, `ok`, `message` |
+| `GET /v1/agent-messages/` | `dailybot-messages` skill | `agent_name` query param |
+| `POST /v1/agent-email/send/` | `dailybot-email` skill (after confirmation + secret scan) | `agent_name`, `to`, `subject`, `body_html`, `metadata` |
+| `https://cli.dailybot.com/install.sh{,.sha256}` | CLI install on first session, with consent | None (download only) |
+
+### Per-repo opt-out
+
+Drop a `.dailybot/disabled` file in any repo where you don't want the skill
+to send anything:
 
 ```bash
-cd <skill-path> && git pull && ./setup.sh
-# OpenClaw: openclaw skills update dailybot
+mkdir -p .dailybot && touch .dailybot/disabled
 ```
 
-### Uninstall
+`shared/context.sh` walks up from the current directory looking for that
+file. If it finds one, it exits silently and no telemetry leaves the
+machine. The check is performed before every report, health check, message
+poll, and email send.
 
-```bash
-rm -rf <skill-path>
-# Also remove symlinks:
-rm -f ~/.cursor/skills/dailybot-report ~/.cursor/skills/dailybot-messages \
-      ~/.cursor/skills/dailybot-email ~/.cursor/skills/dailybot-health
-# OpenClaw: openclaw skills remove dailybot
-```
+### What's never collected
 
-## How It Works
+- File contents from your repo (only repo name and branch from git metadata)
+- Diff statistics or line counts
+- Source code, secrets, environment variables (other than the agent vendor
+  detection vars listed in `shared/context.sh`)
+- Anything from a repo with `.dailybot/disabled` present
 
-1. You work with your agent as usual
-2. The agent uses the appropriate Dailybot skill based on context:
-   - **Report**: after completing significant work, the agent composes a standup-style update
-   - **Messages**: at the start of a session or when idle, the agent checks for team instructions
-   - **Email**: when you ask the agent to send an email, it uses Dailybot's email API
-   - **Health**: during long sessions, the agent sends periodic heartbeats
-3. Your team sees everything in Dailybot — updates, agent status, and can send messages back
+---
 
 ## Authentication
 
-Your agent guides you through authentication on first use. You can also set it up manually:
+Your agent guides you through authentication on first use after you've
+confirmed CLI install. You can also set it up manually:
 
 ```bash
 # Interactive login (email OTP) — recommended
@@ -144,37 +185,44 @@ dailybot config key=your-key
 export DAILYBOT_API_KEY=your-key
 ```
 
-> **Don't have a Dailybot account?** You can register directly from the CLI:
+> **Don't have a Dailybot account?** Register directly from the CLI:
 > ```bash
 > dailybot agent register --org-name "My Team" --agent-name "Cursor"
 > ```
-> This creates an organization and API key. Share the claim URL from the output with your team admin to connect Slack, Teams, Discord, or Google Chat.
+> This creates an organization and API key. Share the claim URL from the
+> output with your team admin to connect Slack, Teams, Discord, or Google
+> Chat.
 
-## What's Inside
+---
+
+## Repository Layout
 
 ```
-dailybot/
-├── SKILL.md                 Root meta-skill — routes to the right sub-skill
-├── README.md                This file
-├── setup.sh                 Creates symlinks for agent platform discovery
+agent-skill/
+├── README.md
+├── LICENSE
+├── SECURITY.md
+├── CHANGELOG.md
+├── setup.sh                       — symlink installer for non-skills.sh users
 ├── docs/
-│   └── openclaw.md          OpenClaw install + CLI first-run notes
-├── shared/
-│   ├── auth.md              Shared auth logic (CLI login, API key, registration)
-│   ├── context.sh           Automated repo/branch/agent context detection
-│   └── http-fallback.md     HTTP API patterns for when CLI is unavailable
-├── report/
-│   ├── SKILL.md             Progress reporting skill
-│   ├── triggers.md          Auto-activation trigger templates per agent
-│   ├── significance.md      When to report vs stay silent
-│   ├── writing-guide.md     Writing templates and forbidden patterns
-│   └── examples.md          15 side-by-side good vs bad report comparisons
-├── messages/
-│   └── SKILL.md             Message checking skill
-├── email/
-│   └── SKILL.md             Email sending skill
-└── health/
-    └── SKILL.md             Health check / status skill
+│   ├── openclaw.md                — OpenClaw-specific notes
+│   └── skill.md                   — public API reference (served at api.dailybot.com/skill.md)
+└── skills/
+    └── dailybot/                  — the discoverable skill (skills.sh entry point)
+        ├── SKILL.md               — router meta-skill
+        ├── shared/
+        │   ├── auth.md            — auth + consent flow
+        │   ├── context.sh         — context detection + .dailybot/disabled check
+        │   └── http-fallback.md   — HTTP API patterns
+        ├── report/
+        │   ├── SKILL.md           — progress reporting
+        │   ├── triggers.md        — auto-activation templates
+        │   ├── significance.md    — when to report vs stay silent
+        │   ├── writing-guide.md   — writing templates
+        │   └── examples.md        — good vs bad examples
+        ├── messages/SKILL.md      — message polling
+        ├── email/SKILL.md         — email sending with safety checks
+        └── health/SKILL.md        — health check / status
 ```
 
 ## Execution Paths
@@ -186,17 +234,56 @@ Every skill supports two execution paths:
 
 Both produce identical results.
 
+## Update
+
+```bash
+# npx
+npx skills update DailyBotHQ/agent-skill
+
+# Git clone
+cd <skill-path> && git pull && ./setup.sh
+
+# OpenClaw
+openclaw skills update dailybot
+```
+
+## Uninstall
+
+```bash
+# Remove the skill pack itself
+rm -rf <skill-path>
+
+# Remove sub-skill symlinks (Claude Code example)
+rm -f ~/.claude/skills/dailybot \
+      ~/.claude/skills/dailybot-report \
+      ~/.claude/skills/dailybot-messages \
+      ~/.claude/skills/dailybot-email \
+      ~/.claude/skills/dailybot-health
+
+# Remove auto-activation block (if you opted in)
+#   Edit the file from the table above and delete the block between
+#   <!-- dailybot-auto-activation: BEGIN --> and <!-- dailybot-auto-activation: END -->.
+#   For Cursor/Windsurf, just delete the dailybot.mdc / dailybot.md file.
+
+# Remove cached approvals
+rm -rf ~/.dailybot
+
+# OpenClaw
+openclaw skills remove dailybot
+```
+
 ## Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
-| Agent doesn't know about Dailybot | Verify the skill pack is in the correct path and run `./setup.sh` |
-| Skill found but not auto-activating | Invoke the report skill once — it sets up an always-on trigger |
-| "Dailybot CLI not found" | Install with `pip install dailybot-cli` or `curl -sSL https://cli.dailybot.com/install.sh \| bash` |
+| Agent doesn't know about Dailybot | Verify the skill pack is installed and run `./setup.sh` |
+| Skill found but not auto-activating | Invoke the report skill once and accept the auto-activation prompt |
+| "Dailybot CLI not found" | Choose one of the install methods in `skills/dailybot/shared/auth.md` |
 | "Not authenticated" | Run `dailybot login`, `dailybot config key=<key>`, or set `DAILYBOT_API_KEY` |
 | Session seems stale | Run `dailybot logout` then `dailybot login` |
-| Reports not appearing | Run `dailybot status --auth` to check authentication and organization |
-| Symlinks not created | Run `./setup.sh` from the skill pack directory |
+| Reports not appearing | Run `dailybot status --auth` and verify no `.dailybot/disabled` file exists |
+| Symlinks not created | Run `./setup.sh` from the skill pack root directory |
+| Want to disable for one repo | `mkdir -p .dailybot && touch .dailybot/disabled` |
 
 ## Links
 
@@ -205,3 +292,5 @@ Both produce identical results.
 - [Dailybot Agents feature](https://www.dailybot.com/features/agents)
 - [Dailybot API skill reference](https://api.dailybot.com/skill.md)
 - [API documentation (Swagger)](https://api.dailybot.com/api/swagger/)
+- [Open Agent Skills standard (agentskills.io)](https://agentskills.io)
+- [skills.sh](https://skills.sh) — cross-agent skills directory
