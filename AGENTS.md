@@ -410,6 +410,47 @@ this `AGENTS.md`:
 If you're updating shared standards in this file, you don't need to mirror
 to per-agent files — `AGENTS.md` is the canonical source.
 
+## Temporary Files (tmp/)
+
+The `tmp/` folder at the repo root is **git-ignored** (everything except
+its own `README.md`) and exists so agents and contributors can do scratch
+work without polluting the working tree or risking accidental commits of
+debug output. The folder is yours — write freely, clean up when done.
+
+Use `tmp/` for:
+
+- **Inter-agent prompts** — drafting a prompt for another agent before
+  invoking it (`tmp/prompts/codex-review-pr.md`)
+- **Probes against external services** — output from `curl`-ing
+  `cli.dailybot.com`, `api.dailybot.com`, the GitHub API, etc.
+  (`tmp/probes/cdn-check-2026-05-01.txt`)
+- **Scratch experiments** — throwaway shell scripts or one-off tooling
+  (`tmp/scratch/test-frontmatter-edge-case.sh`)
+- **Data exports** — query results, downloaded artifacts you want to
+  inspect without committing (`tmp/exports/skills-sh-listings.json`)
+- **Personal scratch space** — `tmp/<your-handle>/` to avoid stepping
+  on parallel work
+
+Common subdirectory pattern (suggested but not enforced):
+`tmp/scratch/`, `tmp/prompts/`, `tmp/probes/`, `tmp/exports/`.
+
+**The hard rule:** nothing under `tmp/` is ever committed. If a file
+you drafted in `tmp/` deserves to live in the repo, **move** it to its
+proper home (`skills/dailybot/`, `tests/`, `scripts/`, `docs/`,
+or the repo root) and `git add` it from there — never `git add tmp/...`
+because the `.gitignore` will reject the file anyway and the path
+itself is wrong.
+
+CI does not look at `tmp/`. The frontmatter validator and bats tests
+only see `skills/`, `tests/`, and a handful of named files. So there's
+no risk of half-finished drafts breaking checks while you iterate.
+
+If you create `tmp/` yourself by accident on a fresh clone (it's
+already there in committed form via the README), it survives `git
+clean -fd` because it's tracked.
+
+---
+
 ## When in Doubt
 
 - **Behavior of an end-user-facing flow** → read the relevant SKILL.md

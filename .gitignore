@@ -1,0 +1,71 @@
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.history/
+*.bak
+*.tmp
+
+# Python (scripts/validate-frontmatter.py + any other helper)
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Node (some contributors may run `npx skills` locally for testing)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.yarn/
+.pnp.*
+
+# Bats / shellcheck artifacts
+.bats-cache/
+
+# Local environment overrides
+.env
+.env.local
+.env.*.local
+.envrc
+
+# Test / coverage outputs
+coverage/
+.coverage
+*.cov
+*.log
+
+# Built / packaged artifacts (we have none today — defensive)
+dist/
+build/
+out/
+
+# Repo `tmp/` for scratch work (see AGENTS.md "Temporary Files")
+# Ignore everything inside, but keep the README so the convention is documented.
+tmp/*
+!tmp/README.md
+
+# Accidentally created skill runtime markers during local testing
+/.dailybot/
