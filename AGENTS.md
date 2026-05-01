@@ -157,7 +157,7 @@ Every `SKILL.md` MUST have YAML frontmatter with at least:
 ---
 name: dailybot-<thing>          # kebab-case, never snake_case (dailybot_thing) or camelCase
 description: <one paragraph>     # used by skills.sh + every agent harness for relevance scoring
-version: "1.0.1"                 # SemVer, quoted to keep it a string
+version: "1.0.0"                 # SemVer, quoted to keep it a string
 documentation_url: https://api.dailybot.com/skill.md  # NEVER use `homepage:` (legacy, dangerous)
 user-invocable: true|false       # whether `/<name>` becomes a slash command
 allowed-tools: Bash, Read, Grep, Glob

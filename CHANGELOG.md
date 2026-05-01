@@ -1,118 +1,71 @@
 # Changelog
 
-All notable changes to the DailyBot agent skill pack are documented in this
+All notable changes to the Dailybot agent skill pack are documented in this
 file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] — 2026-05-01
+## [1.0.0] — 2026-05-01
 
-### Added (repository-development infrastructure — does not affect installed skill)
-
-- `AGENTS.md` at the repo root with the canonical contributor guide for AI
-  agents working on this repository, plus a `CLAUDE.md` symlink pointing at
-  it. Documents what ships at runtime vs. what stays as dev infrastructure,
-  the public surface that must not be broken, and the consent-flow
-  philosophy behind every behavior change.
-- `CONTRIBUTING.md` with a friendlier human counterpart to AGENTS.md.
-- GitHub Actions CI in `.github/workflows/ci.yml` covering: shellcheck on
-  every shipped shell script, JSON-validity smoke tests on `context.sh`
-  including the `.dailybot/disabled` opt-out and `DAILYBOT_AGENT_TOOL`
-  override paths, bats-core tests, frontmatter validation, bash 3.2
-  compatibility on macOS runners, and markdown link checking.
-- `tests/` directory with bats-core tests for `context.sh` (10 cases) and
-  `setup.sh` (7 cases). Tests use isolated temp dirs and a fake `HOME` so
-  they don't touch the contributor's real agent installations.
-- `scripts/verify-cdn.sh` — probes `cli.dailybot.com` to confirm both
-  `install.sh` and `install.sh.sha256` are reachable and that the
-  checksum matches the script. Optionally checks `install.ps1` and its
-  checksum if Windows native support has been published.
-- `scripts/validate-frontmatter.py` — schema check that fails CI if any
-  `SKILL.md` introduces `name: dailybot_*` (snake_case), the legacy
-  `homepage:` field, an unquoted version, or any of the other deviations
-  from the conventions in AGENTS.md.
-- `.github/ISSUE_TEMPLATE/` with bug-report and feature-request templates
-  that prompt for the agent + OS + install method context we need to
-  triage reports.
-- `.github/PULL_REQUEST_TEMPLATE.md` with the same pre-merge checklist
-  the AGENTS.md documents inline, so contributors can verify before
-  requesting review.
-
-None of these files ship to end users. Only `skills/dailybot/` is included
-when the skill is installed via `npx skills add`, `openclaw skills install`,
-or `git clone + setup.sh`.
-
-## [1.0.1] — 2026-05-01
-
-### Changed
-
-- **CLI install ordering corrected.** The `cli.dailybot.com/install.sh`
-  script auto-detects the OS internally (Homebrew on macOS, prebuilt binary
-  on Linux x86_64, pipx/uv/pip elsewhere), so the SHA-256-verified
-  `curl … install.sh` flow is now documented as the **primary**
-  cross-platform path instead of being demoted to a fallback. Brew and pip
-  are listed only as manual-control alternatives. This restores universal
-  coverage (macOS, Linux, WSL, Docker, CI) without compromising the
-  verification + consent guarantees added in 1.0.0.
-- Added a Native Windows install path using PowerShell (`Invoke-RestMethod`
-  + `Get-FileHash` checksum verification). Prefers WSL/Git Bash when the
-  developer has either available.
-
-### Added
-
-- `DAILYBOT_AUTO_YES=1` environment variable. When set, the skill skips the
-  interactive consent prompt for CLI install and for the auto-activation
-  trigger write — the SHA-256 verification still runs. Intended for CI,
-  Docker, and developers who have already audited the skill internally.
-  **Email pre-send checks (recipient confirmation + secret-pattern scan)
-  are NOT bypassed by this variable** — they remain mandatory regardless of
-  environment.
-
-## [1.0.0] — 2026-04-30
-
-First public release on the open Agent Skills standard. Distributable via
+First public release on the open
+[Agent Skills](https://agentskills.io) standard. Distributable via
 [skills.sh](https://skills.sh) (`npx skills add DailyBotHQ/agent-skill`),
-direct git clone, or the per-agent paths documented in `README.md`.
+[OpenClaw](https://www.openclaw.dev) (`openclaw skills install dailybot`),
+and direct git clone with `setup.sh`.
 
-### Added
+The skill ships four capabilities (progress reports, message polling,
+email, health checks) coordinated by a router meta-skill, with
+authentication and context detection shared across all of them. Anything
+outside `skills/dailybot/` is repo-development infrastructure and is not
+distributed at runtime.
 
-- Repository structured under `skills/dailybot/` to match the skills.sh
-  discovery convention.
-- `LICENSE` (MIT) and `SECURITY.md` with a coordinated-disclosure process.
-- `version` field in every `SKILL.md` frontmatter.
-- README section **"What this skill does to your environment"** enumerating
-  every binary installed, file modified, network call made, and persistent
-  trigger added by the skill.
-- `.dailybot/disabled` marker — when present in the repo root, the bundled
-  `context.sh` exits silently and no telemetry is collected.
-- Email guards: per-recipient first-use confirmation cached in
-  `~/.dailybot/email-approvals.json`, and a credential-pattern scan that
-  blocks `body_html` containing values that look like API keys, secrets,
-  AWS access keys, Stripe keys, or Slack tokens.
-- Auto-activation marker `<!-- dailybot-auto-activation -->` wrapping every
-  trigger block written into `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, etc., so
-  users can locate and remove the block deterministically.
+### Highlights
 
-### Changed
+- **Cross-agent compatible** — works with Claude Code, Cursor, OpenAI
+  Codex, Gemini CLI, GitHub Copilot, Cline, Windsurf, and OpenClaw out of
+  the box. `setup.sh` auto-detects installed agents and creates the
+  per-agent symlinks.
+- **Universal install path** — the bundled
+  `https://cli.dailybot.com/install.sh` auto-detects the OS internally
+  (Homebrew on macOS, prebuilt binary on Linux x86_64, pipx/uv/pip
+  elsewhere). Native Windows users get a verified PowerShell variant.
+- **Consent-first by default** — CLI install asks for confirmation the
+  first time in a session and runs only after SHA-256 verification of
+  the install script. Auto-activation in agent config files
+  (`CLAUDE.md`, `AGENTS.md`, etc.) is opt-in with a visible
+  `<!-- dailybot-auto-activation: BEGIN/END -->` marker so users can
+  uninstall deterministically. Email sends require per-recipient
+  confirmation, cache approvals in `~/.dailybot/email-approvals.json`,
+  and abort on credential-pattern matches in the body or subject.
+- **Per-repo opt-out** — drop `.dailybot/disabled` in any repo root and
+  every outbound call from this skill stops silently for that repo.
+- **CI escape hatch** — `DAILYBOT_AUTO_YES=1` skips the interactive
+  consent prompts for install and auto-activation. SHA-256 verification
+  still runs. Email pre-send checks are not bypassed.
+- **Hardened by default** — all shell scripts use `set -euo pipefail`,
+  pass `shellcheck` clean, work on bash 3.2 (macOS default), prefer
+  vendor environment variables over process-name pattern matching for
+  agent detection, and serialize JSON via `jq` (with `python3` and
+  hardened-bash fallbacks) so control characters never break the
+  payload.
+- **Auditable** — `README.md` enumerates every binary the skill may
+  install, every file it may create or modify, every network endpoint
+  it may reach with the data sent, and the full uninstall recipe.
+  `SECURITY.md` documents the disclosure channel
+  (`security@dailybot.com`) and response SLA.
 
-- `homepage` field in skill frontmatter renamed to `documentation_url` so
-  agent harnesses do not treat it as a re-fetch source.
-- CLI install no longer auto-runs without consent. The install command is
-  shown to the developer with a one-time confirmation prompt; subsequent
-  invocations in the same session do not re-prompt. The `curl | bash` path
-  is documented as a fallback after SHA-256 verification, with Homebrew and
-  pip listed as preferred alternatives.
-- Auto-activation in agent config files (`CLAUDE.md`, `AGENTS.md`, etc.) is
-  now opt-in. The skill shows the exact file path, the exact content to be
-  appended, and an uninstall instruction before writing.
-- `setup.sh` now uses `set -euo pipefail` and resolves agent paths under the
-  new `skills/dailybot/` layout.
-- `shared/context.sh` prefers explicit environment variables over `ps aux`
-  pattern matching for agent detection, falls back to `ps -o comm= -p $PPID`
-  by basename, and uses `jq` (then `python3`, then a hardened bash
-  fallback) to serialize JSON safely with control characters.
+### Repository conventions
 
-### Security
-
-- Initial public security review applied. See `SECURITY.md` for the
-  disclosure channel and `README.md` for the full inventory of behaviors
-  that touch the user's environment.
+- All SKILL.md files use kebab-case `name`, quoted SemVer `version`,
+  and `documentation_url` (the legacy `homepage` field is rejected by
+  CI).
+- Public surface that downstream systems depend on: HTTP endpoints
+  under `api.dailybot.com/v1/agent-*/`, CLI flag names documented in
+  any SKILL.md, the `dailybot-auto-activation` markers, the
+  `.dailybot/disabled` opt-out, and the `DAILYBOT_AUTO_YES` and
+  `DAILYBOT_API_KEY` environment variables.
+- Contributor guide lives in [`AGENTS.md`](AGENTS.md) (with a
+  `CLAUDE.md` symlink for Claude Code), with a friendlier human
+  counterpart in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+- CI runs shellcheck, bats-core tests for `context.sh` and `setup.sh`,
+  frontmatter validation, bash 3.2 compatibility checks on macOS
+  runners, and markdown link checking on every PR.
