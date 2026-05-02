@@ -35,7 +35,6 @@ convention and the reasoning behind each.
 - [ ] Version bumped in `skills/dailybot/SKILL.md` if releasing
 - [ ] Public surface preserved (CLI flags, HTTP endpoints, markers, env vars) — or major version bumped with migration note
 - [ ] Consent flows preserved (install consent, auto-activation opt-in, email pre-send checks)
-- [ ] User-facing strings use "Dailybot" (lowercase 'b'), not "DailyBot"
 - [ ] Commit messages follow `<type>(<scope>): description` format
 
 ## Test plan

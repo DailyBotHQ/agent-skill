@@ -3,9 +3,7 @@
 **Purpose:** Single source of truth for any AI coding assistant (Claude Code,
 Cursor AI, OpenAI Codex, Gemini CLI, GitHub Copilot, others) that **edits
 this repository**. This file is for contributors, not for end users of the
-skill. Notice we write **"Dailybot"** (lowercase 'b') for user-facing content
-and documentation — "DailyBot" (capital 'B') is the legacy spelling and must
-not appear in new user-visible text.
+skill.
 
 > [!IMPORTANT]
 > **This file is NOT installed.** When users install the skill (via
@@ -126,19 +124,7 @@ bash scripts/verify-cdn.sh
 All code, comments, documentation, and commit messages MUST be in English.
 This is a public open-source repo consumed worldwide.
 
-### 2. Brand spelling: "Dailybot", not "DailyBot"
-
-In **user-facing text** the product is **Dailybot** (lowercase 'b'). The
-legacy spelling "DailyBot" must not appear in new user-visible content
-(SKILL.md descriptions, README sections, prompts the skill emits, error
-messages users see).
-
-**Does NOT apply to:** GitHub org name (`DailybotHQ`), git repo URLs,
-package names already published as `DailybotHQ/cli`, environment variables
-(`DAILYBOT_API_KEY` keeps screaming-snake), or code identifiers. These are
-contracts between systems, not user-facing strings.
-
-### 3. The runtime artifact is `skills/dailybot/` — keep it pure
+### 2. The runtime artifact is `skills/dailybot/` — keep it pure
 
 If you create a new file or directory, ask: *"does this need to be on the
 end user's disk for the skill to work at runtime?"*
@@ -151,7 +137,7 @@ Never reach **out of** `skills/dailybot/` for anything at runtime — every
 runtime file must be self-contained inside that directory because that's
 what skills.sh ships.
 
-### 4. SKILL.md frontmatter conventions
+### 3. SKILL.md frontmatter conventions
 
 Every `SKILL.md` MUST have YAML frontmatter with at least:
 
@@ -170,7 +156,7 @@ The `documentation_url` field replaces the legacy `homepage` because some
 agent harnesses interpret `homepage` as a re-fetch source. `validate-frontmatter.py`
 will fail CI if any SKILL.md uses the old key.
 
-### 5. Don't roll back the consent flows
+### 4. Don't roll back the consent flows
 
 The 1.0.0 release added three consent guarantees that must not regress:
 
@@ -190,7 +176,7 @@ These exist because they close audit findings that determine whether
 Vercel will accept us on `skills.sh/official` and whether enterprise
 buyers approve the skill.
 
-### 6. Bash 3.2 compatibility (macOS default)
+### 5. Bash 3.2 compatibility (macOS default)
 
 macOS still ships bash 3.2 by default. Anything under `setup.sh` or
 `skills/dailybot/shared/*.sh` must run on bash 3.2 — that means:
@@ -203,7 +189,7 @@ macOS still ships bash 3.2 by default. Anything under `setup.sh` or
 
 CI runs on `macos-latest` to enforce this.
 
-### 7. `set -euo pipefail` everywhere
+### 6. `set -euo pipefail` everywhere
 
 All shell scripts start with:
 
@@ -216,7 +202,7 @@ This catches typos and missing variables early. Use `${var:-default}` for
 optional variables, and guard array length checks with `${#arr[@]}` so the
 script doesn't trip on empty arrays under `set -u`.
 
-### 8. Don't break the public surface
+### 7. Don't break the public surface
 
 These are public contracts other systems depend on. Changing them is a
 breaking change that requires a major version bump (`2.0.0`) and a
@@ -233,7 +219,7 @@ migration note in `CHANGELOG.md`:
 - `DAILYBOT_API_KEY` env var
 - Skill `name` field in frontmatter (skills.sh registry references it)
 
-### 9. Update CHANGELOG.md when behavior changes
+### 8. Update CHANGELOG.md when behavior changes
 
 Any change a user could observe goes in `CHANGELOG.md` under the next
 version. CI fails if you change a `skills/dailybot/**/*.md` or
@@ -242,7 +228,7 @@ version. CI fails if you change a `skills/dailybot/**/*.md` or
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
 sections `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
 
-### 10. Cross-platform reality
+### 9. Cross-platform reality
 
 Test changes that touch the install or runtime path against:
 
@@ -352,12 +338,11 @@ that's both validation and documentation.
 7. Modify a `skills/dailybot/` file without updating `CHANGELOG.md` and bumping the version
 8. Break the `<!-- dailybot-auto-activation -->` markers — users grep for them to uninstall
 9. Change the HTTP endpoint shapes or CLI flag names without a major version bump
-10. Use "DailyBot" (capital 'B') in new user-visible content — use "Dailybot"
-11. Push to `main` without running `shellcheck` and `bats tests/` locally
-12. Update `install.sh` in `DailybotHQ/cli` without also publishing the new `install.sh.sha256` to the CDN — the skill will refuse to install
-13. Add a new sub-skill folder without giving it its own `SKILL.md` with full frontmatter
-14. Send a PR that only touches `docs/API_REFERENCE.md` (the public API ref) without mirroring the change to the matching `skills/dailybot/**/SKILL.md` — they describe the same surface
-15. Hardcode literal SHA-256 hashes anywhere in this repo — they belong on the CDN, generated at release time
+10. Push to `main` without running `shellcheck` and `bats tests/` locally
+11. Update `install.sh` in `DailybotHQ/cli` without also publishing the new `install.sh.sha256` to the CDN — the skill will refuse to install
+12. Add a new sub-skill folder without giving it its own `SKILL.md` with full frontmatter
+13. Send a PR that only touches `docs/API_REFERENCE.md` (the public API ref) without mirroring the change to the matching `skills/dailybot/**/SKILL.md` — they describe the same surface
+14. Hardcode literal SHA-256 hashes anywhere in this repo — they belong on the CDN, generated at release time
 
 ### DO
 
@@ -373,8 +358,7 @@ that's both validation and documentation.
 10. Test `context.sh` in three scenarios: regular dir, `.dailybot/disabled` present, `DAILYBOT_AGENT_TOOL` set
 11. Mirror changes between `docs/API_REFERENCE.md` and the runtime SKILL.md files when public surface evolves
 12. Generate the install script SHA-256 in CI of `DailybotHQ/cli`, never by hand
-13. Use "Dailybot" in user-visible text
-14. Preserve the consent flow philosophy when touching auth.md, Step 0 of report, or email/
+13. Preserve the consent flow philosophy when touching auth.md, Step 0 of report, or email/
 
 ## Pre-Commit Checklist
 
@@ -391,7 +375,6 @@ that's both validation and documentation.
 - [ ] Public surface preserved (CLI flags, HTTP endpoints, markers, env vars)
 - [ ] Consent flows preserved (install consent, auto-activation opt-in, email confirm)
 - [ ] Setup.sh tested with at least `./setup.sh --host claude`
-- [ ] Brand: "Dailybot" (lowercase 'b') in any new user-facing string
 - [ ] Commit message follows `<type>(<scope>): description` format
 
 ## Shared Agent Coordination
