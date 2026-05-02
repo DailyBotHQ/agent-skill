@@ -8,7 +8,7 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 First public release on the open
 [Agent Skills](https://agentskills.io) standard. Distributable via
-[skills.sh](https://skills.sh) (`npx skills add DailyBotHQ/agent-skill`),
+[skills.sh](https://skills.sh) (`npx skills add DailybotHQ/agent-skill`),
 [OpenClaw](https://www.openclaw.dev) (`openclaw skills install dailybot`),
 and direct git clone with `setup.sh`.
 

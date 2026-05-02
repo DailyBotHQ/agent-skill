@@ -2,7 +2,7 @@
 # verify-cdn.sh — sanity-check that cli.dailybot.com publishes the install
 # script and its SHA-256 checksum, and that the checksum matches the script.
 #
-# Run this after every release of DailyBotHQ/cli to confirm the CDN is in
+# Run this after every release of DailybotHQ/cli to confirm the CDN is in
 # sync. The skill's auth.md flow refuses to install if the .sha256 is
 # unreachable, so this script is also useful as an early-warning check.
 #
@@ -40,9 +40,9 @@ if ! curl -fsSL "$SHA_URL" -o "$WORK_DIR/install.sh.sha256" 2>/dev/null; then
   skills/dailybot/shared/auth.md. The skill will refuse to run install.sh
   when the checksum is unreachable.
 
-  Publish the checksum from the DailyBotHQ/cli repo:
+  Publish the checksum from the DailybotHQ/cli repo:
 
-      cd /path/to/DailyBotHQ/cli
+      cd /path/to/DailybotHQ/cli
       shasum -a 256 install.sh > install.sh.sha256
       # then upload install.sh.sha256 to the CDN serving cli.dailybot.com
       # (e.g. aws s3 cp install.sh.sha256 s3://<your-bucket>/install.sh.sha256)
@@ -68,7 +68,7 @@ else
   Likely cause: install.sh was updated on the CDN but the matching .sha256
   was not. Regenerate and re-upload the checksum:
 
-      cd /path/to/DailyBotHQ/cli
+      cd /path/to/DailybotHQ/cli
       shasum -a 256 install.sh > install.sh.sha256
       # re-upload to CDN
 

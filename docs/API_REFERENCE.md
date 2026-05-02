@@ -1,6 +1,6 @@
 ---
 name: dailybot
-description: Dailybot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailyBotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
+description: Dailybot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailybotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
 ---
 
 # Dailybot — Skill for AI Agents
@@ -15,20 +15,20 @@ Dailybot is the visibility and orchestration layer for modern teams where humans
 
 **This file** (`https://api.dailybot.com/skill.md`) is the **API reference and CLI guide**. It is NOT the full skill pack. Downloading only this file does not install the Dailybot skills.
 
-**The skill pack** lives at **https://github.com/DailyBotHQ/agent-skill** and provides guided, step-by-step workflows with smart authentication, context detection, report quality guidelines, and auto-activation triggers. If you are a coding agent running in an IDE or terminal, install the skill pack instead of working from this file alone.
+**The skill pack** lives at **https://github.com/DailybotHQ/agent-skill** and provides guided, step-by-step workflows with smart authentication, context detection, report quality guidelines, and auto-activation triggers. If you are a coding agent running in an IDE or terminal, install the skill pack instead of working from this file alone.
 
 ### Install the Skill Pack
 
 The fastest path is the cross-agent installer:
 
 ```bash
-npx skills add DailyBotHQ/agent-skill
+npx skills add DailybotHQ/agent-skill
 ```
 
 Or clone manually + run `setup.sh`:
 
 ```bash
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/dailybot-skill
+git clone https://github.com/DailybotHQ/agent-skill.git ~/dailybot-skill
 cd ~/dailybot-skill
 ./setup.sh
 ```

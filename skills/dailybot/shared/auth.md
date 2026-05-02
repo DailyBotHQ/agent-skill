@@ -62,7 +62,7 @@ Show the developer this prompt the first time:
 
 On confirmation, run the three commands. If the SHA-256 check fails, **abort**
 and warn the developer — do not run the script. The
-`sync-installer-checksums.yml` workflow on `DailyBotHQ/cli` keeps
+`sync-installer-checksums.yml` workflow on `DailybotHQ/cli` keeps
 `install.sh` and `install.sh.sha256` in lockstep, so a mismatch in the
 verified path indicates either a stale Cloudflare cache, a CDN compromise,
 or a man-in-the-middle situation — never a normal first-day experience.

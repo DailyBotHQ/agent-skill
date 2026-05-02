@@ -8,7 +8,7 @@ but in a friendlier format. If you're an AI agent reading this, prefer
 ## Quick start
 
 ```bash
-git clone https://github.com/DailyBotHQ/agent-skill.git
+git clone https://github.com/DailybotHQ/agent-skill.git
 cd agent-skill
 
 # Install the skill into your local agent (Claude Code in this example) so

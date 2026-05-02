@@ -20,8 +20,8 @@ Dailybot connects AI coding agents to their human team. This is a skill pack wit
 
 The `documentation_url` in frontmatter points to `https://api.dailybot.com/skill.md`. That URL is the **public API reference** (HTTP endpoints and curl examples). It is **not** the GitHub skill pack (router, `shared/`, sub-skills, `setup.sh`).
 
-- **OpenClaw:** Install the pack with `openclaw skills install dailybot`, or clone `https://github.com/DailyBotHQ/agent-skill` into `<workspace>/skills/dailybot/`.
-- **skills.sh / npx:** `npx skills add DailyBotHQ/agent-skill` from any supported agent.
+- **OpenClaw:** Install the pack with `openclaw skills install dailybot`, or clone `https://github.com/DailybotHQ/agent-skill` into `<workspace>/skills/dailybot/`.
+- **skills.sh / npx:** `npx skills add DailybotHQ/agent-skill` from any supported agent.
 - **Do not** treat downloading only `api.dailybot.com/skill.md` as a full install — agents need the complete repository or registry install.
 
 **Dailybot CLI:** Before any API call, ensure the CLI exists (`command -v dailybot`). If missing, follow the consent flow in [`shared/auth.md`](shared/auth.md) — the universal install script (`curl … install.sh` with SHA-256 verification) handles macOS / Linux / WSL / Docker / CI by auto-detecting the OS internally. Native Windows users get a PowerShell variant. `DAILYBOT_AUTO_YES=1` skips the interactive prompt for CI and power users. HTTP API with `DAILYBOT_API_KEY` is the last-resort fallback when no CLI can run.

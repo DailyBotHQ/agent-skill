@@ -54,7 +54,7 @@ small helper scripts (`setup.sh`, `shared/context.sh`, plus the
 `https://cli.dailybot.com/install.sh` script in a separate repo).
 
 **Companion repo:** the Dailybot CLI lives at
-[github.com/DailyBotHQ/cli](https://github.com/DailyBotHQ/cli) and publishes
+[github.com/DailybotHQ/cli](https://github.com/DailybotHQ/cli) and publishes
 its installer to `cli.dailybot.com`. This skill repo references that CLI
 but does not contain it.
 
@@ -133,8 +133,8 @@ legacy spelling "DailyBot" must not appear in new user-visible content
 (SKILL.md descriptions, README sections, prompts the skill emits, error
 messages users see).
 
-**Does NOT apply to:** GitHub org name (`DailyBotHQ`), git repo URLs,
-package names already published as `DailyBotHQ/cli`, environment variables
+**Does NOT apply to:** GitHub org name (`DailybotHQ`), git repo URLs,
+package names already published as `DailybotHQ/cli`, environment variables
 (`DAILYBOT_API_KEY` keeps screaming-snake), or code identifiers. These are
 contracts between systems, not user-facing strings.
 
@@ -267,17 +267,17 @@ End-to-end: how a change in this repo reaches users.
    release notes are auto-generated from the changelog entry
 4. **skills.sh re-indexes** automatically (within hours of the push to
    `main`) — no manual action needed
-5. **Existing users**: `npx skills update DailyBotHQ/agent-skill` or
+5. **Existing users**: `npx skills update DailybotHQ/agent-skill` or
    `cd <skill-path> && git pull`
 6. **OpenClaw users**: `openclaw skills update dailybot`
 
 For changes that affect the install script (`cli.dailybot.com/install.sh`),
 the actual script lives in
-[github.com/DailyBotHQ/cli](https://github.com/DailyBotHQ/cli) — coordinate
+[github.com/DailybotHQ/cli](https://github.com/DailybotHQ/cli) — coordinate
 across both repos. After the install.sh changes:
 
 ```bash
-cd /path/to/DailyBotHQ/cli
+cd /path/to/DailybotHQ/cli
 shasum -a 256 install.sh > install.sh.sha256
 # Upload both files to the CDN serving cli.dailybot.com
 ```
@@ -354,7 +354,7 @@ that's both validation and documentation.
 9. Change the HTTP endpoint shapes or CLI flag names without a major version bump
 10. Use "DailyBot" (capital 'B') in new user-visible content — use "Dailybot"
 11. Push to `main` without running `shellcheck` and `bats tests/` locally
-12. Update `install.sh` in `DailyBotHQ/cli` without also publishing the new `install.sh.sha256` to the CDN — the skill will refuse to install
+12. Update `install.sh` in `DailybotHQ/cli` without also publishing the new `install.sh.sha256` to the CDN — the skill will refuse to install
 13. Add a new sub-skill folder without giving it its own `SKILL.md` with full frontmatter
 14. Send a PR that only touches `docs/API_REFERENCE.md` (the public API ref) without mirroring the change to the matching `skills/dailybot/**/SKILL.md` — they describe the same surface
 15. Hardcode literal SHA-256 hashes anywhere in this repo — they belong on the CDN, generated at release time
@@ -372,7 +372,7 @@ that's both validation and documentation.
 9. Test `setup.sh` manually with `--host claude` after touching it
 10. Test `context.sh` in three scenarios: regular dir, `.dailybot/disabled` present, `DAILYBOT_AGENT_TOOL` set
 11. Mirror changes between `docs/API_REFERENCE.md` and the runtime SKILL.md files when public surface evolves
-12. Generate the install script SHA-256 in CI of `DailyBotHQ/cli`, never by hand
+12. Generate the install script SHA-256 in CI of `DailybotHQ/cli`, never by hand
 13. Use "Dailybot" in user-visible text
 14. Preserve the consent flow philosophy when touching auth.md, Step 0 of report, or email/
 

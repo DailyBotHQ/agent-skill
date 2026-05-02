@@ -34,14 +34,14 @@ The [skills.sh](https://skills.sh) CLI auto-detects your agent and installs
 the skill in the right place:
 
 ```bash
-npx skills add DailyBotHQ/agent-skill
+npx skills add DailybotHQ/agent-skill
 ```
 
 To target a specific agent or list available skills first:
 
 ```bash
-npx skills add DailyBotHQ/agent-skill --list
-npx skills add DailyBotHQ/agent-skill -a claude-code
+npx skills add DailybotHQ/agent-skill --list
+npx skills add DailybotHQ/agent-skill -a claude-code
 ```
 
 ### Option 2 — Git clone + setup script
@@ -60,7 +60,7 @@ Pick the path for your agent, clone, then run `setup.sh`:
 | OpenClaw | `<workspace>/skills/dailybot/` or `~/.openclaw/skills/` |
 
 ```bash
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/dailybot-skill
+git clone https://github.com/DailybotHQ/agent-skill.git ~/dailybot-skill
 cd ~/dailybot-skill
 ./setup.sh                # auto-detect installed agents
 ./setup.sh --host claude  # or target one agent explicitly
@@ -283,7 +283,7 @@ Both produce identical results.
 
 ```bash
 # npx
-npx skills update DailyBotHQ/agent-skill
+npx skills update DailybotHQ/agent-skill
 
 # Git clone
 cd <skill-path> && git pull && ./setup.sh

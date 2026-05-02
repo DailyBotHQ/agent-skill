@@ -82,7 +82,7 @@ The reason it has to be inside:
 
 There are two install paths:
 
-- **`npx skills add DailyBotHQ/agent-skill`** — uses skills.sh CLI,
+- **`npx skills add DailybotHQ/agent-skill`** — uses skills.sh CLI,
   the canonical cross-agent installer
 - **`git clone … && ./setup.sh`** — symlinks the pack and each
   sub-skill into the agent's skills directory
@@ -187,7 +187,7 @@ escape for sensitive contexts.
 ## 10. We use our own skill in this repo (eat our own dog food)
 
 Contributors to this repo are encouraged to install
-`DailyBotHQ/agent-skill` and let it auto-activate during their work
+`DailybotHQ/agent-skill` and let it auto-activate during their work
 here. When they finish a meaningful change, the report skill fires and
 sends a Daily Standup-style update to the Dailybot organization.
 

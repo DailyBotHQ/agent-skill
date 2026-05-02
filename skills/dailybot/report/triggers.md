@@ -192,7 +192,7 @@ openclaw skills install dailybot
 **Install manually:**
 
 ```bash
-git clone https://github.com/DailyBotHQ/agent-skill.git <workspace>/skills/dailybot
+git clone https://github.com/DailybotHQ/agent-skill.git <workspace>/skills/dailybot
 ```
 
 **Configure API key** in `~/.openclaw/openclaw.json`:
