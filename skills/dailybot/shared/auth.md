@@ -30,67 +30,83 @@ later invocations in the same session — once the developer has confirmed,
 treat that as session-wide consent.
 
 > [!NOTE]
-> The Dailybot CLI ships **one universal install script** that auto-detects
-> the OS and chooses the right strategy internally:
-> - **macOS** → `brew install dailybothq/tap/dailybot`
-> - **Linux x86_64** → prebuilt binary released on GitHub
-> - **Linux ARM / others** → `pipx` → `uv` → `pip` → `pip --user`
+> The Dailybot CLI ships **two installer entry points** that pair with
+> SHA-256 sidecar files. Pick the one that matches the developer's shell:
+> - **`install.sh`** — Linux, macOS, WSL2, Git Bash, Docker, CI. Auto-detects
+>   the OS internally and routes to `brew install dailybothq/tap/dailybot`
+>   on macOS, the prebuilt PyInstaller binary on Linux x86_64, or
+>   `pipx` / `uv tool` / `pip --user` everywhere else.
+> - **`install.ps1`** — only for **native Windows PowerShell** when WSL2 and
+>   Git Bash are unavailable. Wraps `pipx` / `uv tool` / `pip --user` and
+>   requires Python 3.10+ on PATH. There is no native Windows `.exe`.
 >
-> You don't pick a method. The script does. Your job is to verify integrity
-> before executing it.
+> If the developer is on Windows but has WSL2 or Git Bash, prefer
+> `install.sh` — it has broader testing coverage.
 
-#### Primary path: SHA-256-verified script (Linux, macOS, WSL, Docker, CI)
+#### Primary path: SHA-256-verified script (Linux, macOS, WSL2, Git Bash, Docker, CI)
 
 Show the developer this prompt the first time:
 
 > "I'd like to install the Dailybot CLI. The command I'll run is:
 >
 > ```bash
-> curl -sSL https://cli.dailybot.com/install.sh        -o /tmp/dailybot-install.sh
-> curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
-> ( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) && bash /tmp/dailybot-install.sh
+> curl -fsSL https://cli.dailybot.com/install.sh        -o /tmp/install.sh
+> curl -fsSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/install.sh.sha256
+> ( cd /tmp && shasum -a 256 -c install.sh.sha256 ) && bash /tmp/install.sh
 > ```
 >
 > The script auto-detects your OS and uses Homebrew on macOS, the prebuilt
-> binary on Linux, or pip elsewhere. To uninstall later, follow the matching
-> uninstall command in the README. **Should I proceed?** (yes / no)"
+> binary on Linux, or pipx/uv/pip elsewhere. To uninstall or upgrade later,
+> the CLI itself owns those workflows (`dailybot upgrade`). **Should I
+> proceed?** (yes / no)"
 
 On confirmation, run the three commands. If the SHA-256 check fails, **abort**
-and warn the developer — do not run the script.
+and warn the developer — do not run the script. The
+`sync-installer-checksums.yml` workflow on `DailyBotHQ/cli` keeps
+`install.sh` and `install.sh.sha256` in lockstep, so a mismatch in the
+verified path indicates either a stale Cloudflare cache, a CDN compromise,
+or a man-in-the-middle situation — never a normal first-day experience.
 
-If `https://cli.dailybot.com/install.sh.sha256` returns a non-200 (the CDN
-hasn't published the checksum yet), warn the developer and offer two
-choices: (a) run the unverified script anyway with their explicit additional
-consent, or (b) skip CLI install and use the HTTP API path below.
+If `https://cli.dailybot.com/install.sh.sha256` returns a non-200 (rare —
+implies a CDN problem at Cloudflare, not a deploy state on our side), warn
+the developer and offer two choices: (a) run the unverified script anyway
+with their explicit additional consent, or (b) skip CLI install and use
+the HTTP API path below.
 
-#### Native Windows (PowerShell)
-
-For developers on native Windows without WSL or Git Bash:
+#### Native Windows PowerShell (only when WSL2 / Git Bash unavailable)
 
 ```powershell
-$expected = (Invoke-RestMethod https://cli.dailybot.com/install.ps1.sha256).Trim()
-$script   = Invoke-RestMethod https://cli.dailybot.com/install.ps1
-$bytes    = [System.Text.Encoding]::UTF8.GetBytes($script)
-$actual   = (Get-FileHash -Algorithm SHA256 -InputStream ([System.IO.MemoryStream]::new($bytes))).Hash
-if ($actual -ne $expected) { throw "SHA-256 mismatch — refusing to run install.ps1" }
-Invoke-Expression $script
+$tmp = "$env:TEMP\dailybot-install"
+New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+Invoke-WebRequest "https://cli.dailybot.com/install.ps1"        -OutFile "$tmp\install.ps1"
+Invoke-WebRequest "https://cli.dailybot.com/install.ps1.sha256" -OutFile "$tmp\install.ps1.sha256"
+$expected = (Get-Content "$tmp\install.ps1.sha256").Split(" ")[0]
+$actual   = (Get-FileHash "$tmp\install.ps1" -Algorithm SHA256).Hash.ToLower()
+if ($expected -ne $actual) { throw "SHA-256 mismatch — refusing to run install.ps1" }
+& "$tmp\install.ps1"
 ```
 
-If the developer is on WSL or Git Bash, prefer the bash path above — it has
-broader testing coverage.
+`install.ps1` requires Python 3.10+ on PATH (it shells out to
+`pipx` / `uv tool` / `pip --user`). If the developer is on Windows + WSL2
+or Git Bash, the bash path above is preferred — broader test coverage and
+no Python prerequisite.
 
 #### Manual control (developer prefers their own package manager)
 
 If the developer would rather install via their own toolchain instead of the
-script, both produce the same `dailybot` binary:
+script, all three produce the same `dailybot` binary:
 
 - macOS: `brew install dailybothq/tap/dailybot`
-- Cross-platform Python: `pipx install dailybot-cli` or `pip install --user dailybot-cli`
+- Cross-platform Python (recommended for raw control):
+  `pipx install dailybot-cli` or `uv tool install dailybot-cli`
+- Last resort: `pip install --user dailybot-cli`
 
 Use these when the developer says "I'd rather use brew/pipx" or when running
 in an environment that already has one of them set up. Don't surface them as
 the default — the universal script covers more cases and gets the same
-result.
+result. Do **not** `pip install dailybot-cli` against the system Python
+without explicit user consent; the installer scripts already pick the right
+isolated path automatically.
 
 #### Skipping consent prompts (CI / Docker / power users)
 
@@ -105,6 +121,28 @@ After any install attempt, re-check:
 ```bash
 command -v dailybot
 ```
+
+If `dailybot` is not on PATH after a successful install, surface the likely
+cause to the developer and stop — do not loop on retries:
+
+- The shell may not have reloaded PATH (open a new terminal).
+- On Linux, the user-site bin directory (`~/.local/bin`) may not be on PATH.
+- pipx/uv shims may not yet be linked.
+
+#### Upgrading later
+
+The skill does **not** own upgrade logic. The CLI ships its own
+`dailybot upgrade` command (since v1.4.0) that auto-detects how the CLI
+was installed and either runs the right upgrade in a subprocess
+(`pipx`/`uv`/`pip`) or prints the exact command for installs the CLI
+shouldn't drive (Homebrew, prebuilt binary, editable). Tell the developer:
+
+> "To upgrade the Dailybot CLI later, run `dailybot upgrade`. To check
+> whether you're on the latest version, run `dailybot version --check`."
+
+That's the entire upgrade story. Don't pin a version anywhere in the skill,
+don't reimplement upgrade detection, don't suggest re-running the installer
+to get a newer version.
 
 ### If the CLI still cannot be installed
 

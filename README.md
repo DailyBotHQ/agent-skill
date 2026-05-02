@@ -123,21 +123,37 @@ The CLI ships **one universal install script** that auto-detects your OS:
 So the canonical install command on every system is:
 
 ```bash
-curl -sSL https://cli.dailybot.com/install.sh        -o /tmp/dailybot-install.sh
-curl -sSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/dailybot-install.sh.sha256
-( cd /tmp && shasum -a 256 -c dailybot-install.sh.sha256 ) && bash /tmp/dailybot-install.sh
+curl -fsSL https://cli.dailybot.com/install.sh        -o /tmp/install.sh
+curl -fsSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/install.sh.sha256
+( cd /tmp && shasum -a 256 -c install.sh.sha256 ) && bash /tmp/install.sh
 ```
 
-For native Windows (no WSL / Git Bash), the equivalent PowerShell command is
-documented in `skills/dailybot/shared/auth.md`. If you'd rather drive the
-install yourself, `brew install dailybothq/tap/dailybot` (macOS) or
-`pipx install dailybot-cli` (cross-platform) produce the same `dailybot`
-binary.
+For **native Windows without WSL2 / Git Bash**, the equivalent PowerShell
+command is documented in `skills/dailybot/shared/auth.md` and uses
+`install.ps1` + `install.ps1.sha256` instead. If you have WSL2 or Git Bash,
+prefer the bash path above.
+
+If you'd rather drive the install yourself, `brew install dailybothq/tap/dailybot`
+(macOS), `pipx install dailybot-cli`, or `uv tool install dailybot-cli`
+all produce the same `dailybot` binary.
 
 The skill **declines** to run the install script if its published checksum
 (`https://cli.dailybot.com/install.sh.sha256`) is unreachable, and offers to
 either skip the install (use HTTP API) or proceed unverified after explicit
-extra consent.
+extra consent. The checksum is auto-regenerated on every push to the CLI
+repo via `sync-installer-checksums.yml`, so this fallback is rare.
+
+### Upgrading the CLI
+
+The CLI owns its own upgrade flow (since v1.4.0):
+
+```bash
+dailybot upgrade           # auto-detect install method and run the right upgrade
+dailybot version --check   # print current vs latest, with the exact upgrade command
+```
+
+The skill does not pin a CLI version or reimplement upgrade logic —
+PyPI's `dailybot-cli` is the source of truth.
 
 ### Skipping consent prompts (CI, Docker, power users)
 

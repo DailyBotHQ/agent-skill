@@ -84,10 +84,13 @@ if curl -fsSL "$PS1_URL" -o "$WORK_DIR/install.ps1" 2>/dev/null; then
 
     if curl -fsSL "$PS1_SHA_URL" -o "$WORK_DIR/install.ps1.sha256" 2>/dev/null; then
         ok "install.ps1.sha256: $(wc -c < "$WORK_DIR/install.ps1.sha256" | tr -d ' ') bytes"
-        # The PowerShell verification flow uses Get-FileHash on the in-memory
-        # script content (not via shasum -c on disk), so we replicate it here.
-        expected=$(tr -d '[:space:]' < "$WORK_DIR/install.ps1.sha256" | tr '[:lower:]' '[:upper:]')
-        actual=$(shasum -a 256 "$WORK_DIR/install.ps1" | awk '{print $1}' | tr '[:lower:]' '[:upper:]')
+        # Compare the published hash (first field of the .sha256 file)
+        # against the actual hash of the downloaded install.ps1. We don't use
+        # `shasum -c` because the path stored inside the .sha256 file may be
+        # `install.ps1` while our downloaded copy is at a different path; we
+        # only care that the hash matches.
+        expected=$(awk '{print tolower($1)}' "$WORK_DIR/install.ps1.sha256")
+        actual=$(shasum -a 256 "$WORK_DIR/install.ps1" | awk '{print tolower($1)}')
         if [ "$expected" = "$actual" ]; then
             ok "install.ps1 matches the published SHA-256"
         else
