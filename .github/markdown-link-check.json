@@ -1,13 +1,7 @@
 {
   "ignorePatterns": [
     {
-      "pattern": "^https?://api\\.dailybot\\.com"
-    },
-    {
-      "pattern": "^https?://cli\\.dailybot\\.com"
-    },
-    {
-      "pattern": "^https?://www\\.dailybot\\.com"
+      "pattern": "^https?://([a-z0-9-]+\\.)*dailybot\\.com"
     },
     {
       "pattern": "^https?://(www\\.)?openclaw\\."
