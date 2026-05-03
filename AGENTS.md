@@ -25,6 +25,7 @@ the same instructions other agents do.
 | User-facing README | [README.md](README.md) |
 | Security policy | [SECURITY.md](SECURITY.md) |
 | Public CLI/HTTP API reference (mirrored at `api.dailybot.com/skill.md`) | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) |
+| Full installation guide (six install methods, compare/update/uninstall) | [docs/INSTALLATION.md](docs/INSTALLATION.md) |
 | OpenClaw notes | [docs/OPENCLAW.md](docs/OPENCLAW.md) |
 | Design decisions (why the layout is the way it is) | [docs/DESIGN.md](docs/DESIGN.md) |
 | Adding a new sub-skill | [docs/SUB_SKILL_GUIDE.md](docs/SUB_SKILL_GUIDE.md) |

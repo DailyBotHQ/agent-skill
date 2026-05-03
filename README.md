@@ -31,6 +31,13 @@ and context detection through a common `shared/` directory.
 
 ## Install
 
+The three most common paths are below. **Six paths in total** are
+supported (including OpenClaw's native registry, conversational install
+via your agent, manual git clone, and a no-install HTTP-only fallback)
+— see [`docs/INSTALLATION.md`](docs/INSTALLATION.md) for the full
+guide with comparison table and per-method update / uninstall
+instructions.
+
 ### Option 1 — `npx skills` (cross-agent, recommended)
 
 The [skills.sh](https://skills.sh) CLI auto-detects your agent and installs
