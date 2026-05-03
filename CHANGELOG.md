@@ -4,6 +4,45 @@ All notable changes to the Dailybot agent skill pack are documented in this
 file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-05-03
+
+### Changes
+
+- Merge pull request #2 from DailybotHQ/ci/improvements
+- ci: rename secret to AUTOMATION_GITHUB_TOKEN to match the CLI repo
+- ci: use RELEASE_TOKEN secret in auto-release if available
+- ci: dial back to base CI + add auto-release on merge to main
+- ci: rename markdownlint config to a name markdownlint-cli2 accepts
+- ci: harden the workflow + add markdown lint, spell check, and a CDN monitor
+- docs: position the skill explicitly as the official Dailybot agent skill pack
+- Merge pull request #1 from DailybotHQ/feat/initial-public-release-v1.0.0
+- fix(security): point CLI vulnerability link to the correct repo path
+- ci: ignore bare dailybot.com URL so the markdown link checker stops choking on inline JSON in SKILL.md frontmatter
+- docs: drop the brand-spelling rule now that the repo has no legacy spellings to contrast against
+- docs: update repo references to new DailybotHQ org name (lowercase b)
+- feat(skill): align install flow with shipped Dailybot CLI v1.4.0
+- docs: restore brand-spelling rule contrast in meta-documentation
+- docs: normalize brand spelling to Dailybot across user-facing content
+- docs: replace internal microservice names with generic placeholders in examples
+- chore: replace tmp/README.md with .gitkeep placeholder
+- chore: add .gitignore and tmp/ scratch directory for agents
+- docs: align docs/ casing convention and add DESIGN.md + SUB_SKILL_GUIDE.md
+- docs(release): flatten changelog to a single 1.0.0 entry
+- chore(ci): add AGENTS.md, dev-time infrastructure, and CI workflow
+- fix(skill): restore curl|bash as universal install path and add DAILYBOT_AUTO_YES escape hatch
+- docs(skill): rewrite README with environment-disclosure section and align api-docs
+- feat(skill): bash hardening and per-repo telemetry opt-out
+- feat(skill): require explicit consent for CLI install, auto-activation, and email sends
+- chore(skill): restructure to skills/dailybot/ layout and add open-source boilerplate
+- Improvements on timeout management
+- Improvements to skill
+- Improving definition
+- Improvements
+- Initial version
+- Initial version
+- first commit
+
+
 ## [1.0.0] — 2026-05-01
 
 First public release on the open
