@@ -1,7 +1,8 @@
 ---
-name: dailybot_messages
+name: dailybot-messages
 description: Check for pending messages and instructions from your team via Dailybot. Use when starting a work session, when idle, or when asked what to work on next. Messages are instructions that should influence your work.
-homepage: https://api.dailybot.com/skill.md
+version: "1.0.0"
+documentation_url: https://api.dailybot.com/skill.md
 user-invocable: false
 metadata: {"openclaw":{"emoji":"📬","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"cli-install-script","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (official script — preferred on Linux/macOS)"},{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI via pip (fallback if binary fails)"}]}}
 allowed-tools: Bash, Read, Grep, Glob

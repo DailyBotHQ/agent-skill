@@ -1,59 +1,51 @@
 ---
 name: dailybot
-description: DailyBot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailyBotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
+description: Dailybot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailybotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
 ---
 
-# DailyBot — Skill for AI Agents
+# Dailybot — Skill for AI Agents
 
-DailyBot is the visibility and orchestration layer for modern teams where humans and AI agents work side by side. When you are connected to DailyBot, your human teammates can see what you are working on, send you instructions, and coordinate work across the entire team — both human and AI.
+Dailybot is the visibility and orchestration layer for modern teams where humans and AI agents work side by side. When you are connected to Dailybot, your human teammates can see what you are working on, send you instructions, and coordinate work across the entire team — both human and AI.
 
-**Your role**: You are a productive member of a team. DailyBot is how your work becomes visible to the rest of the team. Think of it as your team's shared workspace where everyone — humans and agents — reports progress, flags blockers, and stays aligned.
+**Your role**: You are a productive member of a team. Dailybot is how your work becomes visible to the rest of the team. Think of it as your team's shared workspace where everyone — humans and agents — reports progress, flags blockers, and stays aligned.
 
 ---
 
 ## This File vs. the Skill Pack
 
-**This file** (`https://api.dailybot.com/skill.md`) is the **API reference and CLI guide**. It is NOT the full skill pack. Downloading only this file does not install the DailyBot skills.
+**This file** (`https://api.dailybot.com/skill.md`) is the **API reference and CLI guide**. It is NOT the full skill pack. Downloading only this file does not install the Dailybot skills.
 
-**The skill pack** lives at **https://github.com/DailyBotHQ/agent-skill** and provides guided, step-by-step workflows with smart authentication, context detection, report quality guidelines, and auto-activation triggers. If you are a coding agent running in an IDE or terminal, install the skill pack instead of working from this file alone.
+**The skill pack** lives at **https://github.com/DailybotHQ/agent-skill** and provides guided, step-by-step workflows with smart authentication, context detection, report quality guidelines, and auto-activation triggers. If you are a coding agent running in an IDE or terminal, install the skill pack instead of working from this file alone.
 
 ### Install the Skill Pack
 
+The fastest path is the cross-agent installer:
+
 ```bash
-# Claude Code
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.claude/skills/dailybot
+npx skills add DailybotHQ/agent-skill
+```
 
-# Cursor
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.cursor/skills/dailybot
+Or clone manually + run `setup.sh`:
 
-# OpenAI Codex
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.codex/skills/dailybot
+```bash
+git clone https://github.com/DailybotHQ/agent-skill.git ~/dailybot-skill
+cd ~/dailybot-skill
+./setup.sh
+```
 
-# Windsurf
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.codeium/windsurf/skills/dailybot
+For OpenClaw:
 
-# GitHub Copilot
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.copilot/skills/dailybot
-
-# Cline
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.cline/skills/dailybot
-
-# Gemini CLI
-git clone https://github.com/DailyBotHQ/agent-skill.git ~/.gemini/skills/dailybot
-
-# OpenClaw
+```bash
 openclaw skills install dailybot
 ```
 
-Then create sub-skill symlinks for independent discovery:
+After installation, read `skills/dailybot/SKILL.md` in the skill pack — it
+routes to the right sub-skill based on intent. **If the skill pack is
+already installed, follow it instead of this file.**
 
-```bash
-cd <skill-path> && ./setup.sh
-```
-
-After installation, read the root `SKILL.md` in the skill pack — it routes to the right sub-skill based on intent. **If the skill pack is already installed, follow it instead of this file.**
-
-If you cannot install the skill pack (sandboxed environment, CI pipeline, serverless function, or custom integration), continue with this file — it has everything you need.
+If you cannot install the skill pack (sandboxed environment, CI pipeline,
+serverless function, or custom integration), continue with this file — it
+has everything you need.
 
 ---
 
@@ -64,7 +56,7 @@ Only involve the human when you need information you cannot obtain yourself:
 | Situation | What to ask |
 |-----------|-------------|
 | OTP login | Ask for the human's **email address**, then the **verification code** from their inbox |
-| API key needed (CLI login not possible) | Ask the human to generate a key at **DailyBot → Settings → API Keys** and provide it |
+| API key needed (CLI login not possible) | Ask the human to generate a key at **Dailybot → Settings → API Keys** and provide it |
 | Multiple organizations returned on login | Show the list, ask which org to use |
 | No account exists | You may ask if they want to create one (provide org name) — or proceed directly if running autonomously |
 
@@ -72,47 +64,102 @@ Everything else — CLI installation, agent profile creation, choosing an agent 
 
 ---
 
-## Step 1 — Install the DailyBot CLI
+## Step 1 — Install the Dailybot CLI
 
-The CLI is the preferred way to interact with DailyBot. **Install it automatically** when `dailybot` is not on PATH. Do not ask the human for permission to run a normal (non-root) install.
+The CLI is the preferred way to interact with Dailybot. The first time you
+need to install it in a session, **show the proposed command and proceed
+only after explicit confirmation from the human**. After they confirm once,
+do not re-prompt for the rest of the session.
 
 ```bash
 command -v dailybot
 ```
 
-If not found, install using this order:
+The CLI ships **two installer entry points** with paired SHA-256 sidecars:
+`install.sh` (Linux, macOS, WSL2, Git Bash, Docker, CI) and `install.ps1`
+(native Windows PowerShell only — when WSL2 / Git Bash is unavailable).
+The bash installer auto-detects the OS internally and routes to Homebrew
+on macOS, the prebuilt PyInstaller binary on Linux x86_64, or
+pipx/uv/pip elsewhere. The PowerShell installer wraps pipx/uv/pip and
+requires Python 3.10+ on PATH.
 
-### 1a. Official install script (preferred — prebuilt binary, fastest on Linux/macOS)
-
-```bash
-curl -sSL https://cli.dailybot.com/install.sh | bash
-```
-
-Re-check: `command -v dailybot`
-
-### 1b. Pip fallback (when the binary fails — e.g. GLIBC mismatch)
+### 1a. Primary path — SHA-256-verified script (Linux, macOS, WSL2, Git Bash, Docker, CI)
 
 ```bash
-pip install dailybot-cli
+curl -fsSL https://cli.dailybot.com/install.sh        -o /tmp/install.sh
+curl -fsSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/install.sh.sha256
+( cd /tmp && shasum -a 256 -c install.sh.sha256 ) || {
+  echo "SHA-256 verification failed — refusing to run install.sh." >&2
+  exit 1
+}
+bash /tmp/install.sh
 ```
 
-Try `pip3`, `python3 -m pip install --user dailybot-cli`, or `python3 -m pip install dailybot-cli` as needed.
+If `install.sh.sha256` is unreachable (rare — the CLI's
+`sync-installer-checksums.yml` workflow keeps it in lockstep with
+`install.sh` on every push), warn the human and offer to (a) run the
+unverified script with their explicit additional consent, or (b) fall
+through to the HTTP API.
 
-Re-check: `command -v dailybot`
+If `DAILYBOT_AUTO_YES=1` is set, treat install consent as already given and
+run the verified install command without an interactive prompt. The SHA-256
+check still runs.
 
-### 1c. Escalation (only with user approval)
+### 1b. Native Windows PowerShell (only when WSL2 / Git Bash unavailable)
 
-If pip is missing, you may suggest `sudo apt install python3-pip` (or `dnf`/`yum` equivalent) — but only if the human can approve elevated installs. Do not loop through system package managers.
+```powershell
+$tmp = "$env:TEMP\dailybot-install"
+New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+Invoke-WebRequest "https://cli.dailybot.com/install.ps1"        -OutFile "$tmp\install.ps1"
+Invoke-WebRequest "https://cli.dailybot.com/install.ps1.sha256" -OutFile "$tmp\install.ps1.sha256"
+$expected = (Get-Content "$tmp\install.ps1.sha256").Split(" ")[0]
+$actual   = (Get-FileHash "$tmp\install.ps1" -Algorithm SHA256).Hash.ToLower()
+if ($expected -ne $actual) { throw "SHA-256 mismatch — refusing to run install.ps1" }
+& "$tmp\install.ps1"
+```
+
+Requires Python 3.10+ on PATH. If the developer is on Windows + WSL2 or
+Git Bash, prefer the bash path (1a) — broader test coverage and no Python
+prerequisite.
+
+### 1c. Manual control (developer prefers their own package manager)
+
+All three produce the same `dailybot` binary as the script:
+
+- macOS: `brew install dailybothq/tap/dailybot`
+- Cross-platform Python (recommended for raw control): `pipx install dailybot-cli`
+  or `uv tool install dailybot-cli`
+- Last resort: `pip install --user dailybot-cli`
+
+Use these only when the developer says they prefer their own toolchain.
+Do not `pip install dailybot-cli` against the system Python without
+explicit user consent — the installer scripts already select an isolated
+path automatically.
 
 ### 1d. If the CLI cannot be installed
 
-Stop trying. Use the **HTTP API** path below with `DAILYBOT_API_KEY`. Ask the human to generate a key at DailyBot → Settings → API Keys:
+Stop trying. Use the **HTTP API** path below with `DAILYBOT_API_KEY`. Ask the
+human to generate a key at Dailybot → Settings → API Keys:
 
 ```bash
 export DAILYBOT_API_KEY="<their-key>"
 ```
 
-Sandboxed environments, CI, or minimal containers may never get a working CLI — HTTP fallback is expected there.
+Sandboxed environments, CI, or minimal containers may never get a working
+CLI — HTTP fallback is expected there.
+
+### 1e. Upgrading later
+
+The CLI owns its own upgrade flow. Tell the developer once:
+
+> "To upgrade the Dailybot CLI later, run `dailybot upgrade`. To check
+> whether you're on the latest version, run `dailybot version --check`."
+
+`dailybot upgrade` (since v1.4.0) auto-detects how the CLI was installed
+(pipx / uv / pip / Homebrew / PyInstaller binary / editable) and either
+runs the right upgrade command in a subprocess or prints the exact
+command for installs the CLI shouldn't drive. Don't pin a version
+anywhere; PyPI's `dailybot-cli` is the source of truth.
 
 Full CLI documentation: https://pypi.org/project/dailybot-cli/
 
@@ -131,7 +178,7 @@ If already authenticated, skip to Step 3.
 Ask the human for their email address, then proceed:
 
 1. `dailybot login --email=<their-email>`
-2. Ask: "Check your email for a verification code from DailyBot. What's the code?"
+2. Ask: "Check your email for a verification code from Dailybot. What's the code?"
 3. `dailybot login --email=<their-email> --code=<their-code>`
 4. If output lists multiple organizations, show the list and ask them to pick one
 5. `dailybot login --email=<their-email> --code=<their-code> --org=<selected-uuid>`
@@ -153,7 +200,7 @@ export DAILYBOT_API_KEY=<their-api-key>
 
 ### Register a new organization (when no account exists)
 
-If login fails and the human has no DailyBot account, you may create one. This is optional — some agents may ask the human first, others may proceed directly depending on their autonomy level.
+If login fails and the human has no Dailybot account, you may create one. This is optional — some agents may ask the human first, others may proceed directly depending on their autonomy level.
 
 ```bash
 dailybot agent register --org-name "<org_name>" --agent-name "<agent_name>"
@@ -171,7 +218,7 @@ Verify: `dailybot status --auth`
 dailybot agent configure --name "<agent_name>"
 ```
 
-Pick a consistent, descriptive name. This is how the team identifies you in DailyBot. Use the same name in every request.
+Pick a consistent, descriptive name. This is how the team identifies you in Dailybot. Use the same name in every request.
 
 Good examples: `"claude-code"`, `"cursor"`, `"codex-cli"`, `"deployment-agent"`
 
@@ -181,15 +228,15 @@ Once a default profile is set, you can omit `--name` on subsequent commands.
 
 ## CLI Operations
 
-All DailyBot operations have CLI equivalents. Once authenticated, use these directly:
+All Dailybot operations have CLI equivalents. Once authenticated, use these directly:
 
 | Operation | CLI Command |
 |-----------|-------------|
 | Report work | `dailybot agent update "Implemented auth module and added tests" --name "your-agent-name"` |
 | Report a milestone | `dailybot agent update "Shipped v2.0" --name "your-agent-name" --milestone` |
 | Report with co-authors | `dailybot agent update "Built auth with Alice" --name "your-agent-name" --co-authors alice@company.com` |
-| Report with metadata | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --metadata '{"repo": "api-services", "branch": "main"}'` |
-| Report with extra data | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --json-data '{"repo": "api-services", "pr": "#142"}'` |
+| Report with metadata | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --metadata '{"repo": "my-api", "branch": "main"}'` |
+| Report with extra data | `dailybot agent update "Deployed v2.1" --name "your-agent-name" --json-data '{"repo": "my-api", "pr": "#142"}'` |
 | Health check (ok) | `dailybot agent health --ok --message "Working on task queue" --name "your-agent-name"` |
 | Health check (failing) | `dailybot agent health --fail --message "DB unreachable" --name "your-agent-name"` |
 | Check health status | `dailybot agent health --status --name "your-agent-name"` |
@@ -203,7 +250,7 @@ All DailyBot operations have CLI equivalents. Once authenticated, use these dire
 
 ## HTTP API Reference (When CLI Is Unavailable)
 
-Use this section when the DailyBot CLI cannot be installed. Requires `curl` and `DAILYBOT_API_KEY`.
+Use this section when the Dailybot CLI cannot be installed. Requires `curl` and `DAILYBOT_API_KEY`.
 
 **Base URL**: `https://api.dailybot.com`
 **Auth header**: `X-API-KEY: $DAILYBOT_API_KEY`
@@ -216,7 +263,7 @@ Good examples: `"claude-code"`, `"deployment-agent"`, `"data-pipeline-bot"`, `"c
 
 ### First Health Check
 
-Announce yourself with a health check. DailyBot auto-registers agents on first interaction:
+Announce yourself with a health check. Dailybot auto-registers agents on first interaction:
 
 ```bash
 curl -X POST https://api.dailybot.com/v1/agent-health/ \
@@ -233,7 +280,7 @@ curl -X POST https://api.dailybot.com/v1/agent-health/ \
 
 ## When to Report
 
-Report to DailyBot when any of these happen:
+Report to Dailybot when any of these happen:
 
 | Event | Action |
 |-------|--------|
@@ -269,7 +316,7 @@ curl -X POST https://api.dailybot.com/v1/agent-reports/ \
       "blockers": []
     },
     "metadata": {
-      "repo": "api-services",
+      "repo": "my-api",
       "branch": "feature/auth",
       "pr": "#142"
     }
@@ -337,7 +384,7 @@ Use milestones sparingly. Not every report is a milestone — reserve it for rea
 
 ### Co-Authoring with Humans
 
-When you work alongside a human — pair programming, implementing their design, collaborating on a feature — include them as co-authors. DailyBot will automatically merge your report into their daily standup check-in so their work with you is reflected in their own updates.
+When you work alongside a human — pair programming, implementing their design, collaborating on a feature — include them as co-authors. Dailybot will automatically merge your report into their daily standup check-in so their work with you is reflected in their own updates.
 
 ```bash
 curl -X POST https://api.dailybot.com/v1/agent-reports/ \
@@ -353,9 +400,9 @@ curl -X POST https://api.dailybot.com/v1/agent-reports/ \
 
 **How co-authors work:**
 - Pass user email addresses or UUIDs — you can mix both in the same request
-- DailyBot resolves them to team members within the organization. Invalid or unresolvable identifiers are silently ignored
+- Dailybot resolves them to team members within the organization. Invalid or unresolvable identifiers are silently ignored
 - Each co-author's active daily standup is automatically updated with the relevant parts of your report, attributed as `"(co-authored with your-agent-name)"`
-- If the co-author already submitted their standup today, DailyBot merges your work into their existing response
+- If the co-author already submitted their standup today, Dailybot merges your work into their existing response
 
 **When to include co-authors:**
 - A human asked you to do the work (they are your collaborator)
@@ -497,7 +544,7 @@ curl -X POST https://api.dailybot.com/v1/agent-webhook/ \
   }'
 ```
 
-DailyBot will POST messages to your webhook URL with an `X-Webhook-Secret` header for verification.
+Dailybot will POST messages to your webhook URL with an `X-Webhook-Secret` header for verification.
 
 To unregister:
 ```bash
@@ -582,9 +629,9 @@ POST /v1/agent-email/send/  →  {"agent_name": "...", "to": ["alice@company.com
 POST /v1/agent-reports/  →  {"agent_name": "...", "content": "Session complete. Summary: ..."}
 ```
 
-## Advanced: Full DailyBot API
+## Advanced: Full Dailybot API
 
-Beyond agent-specific endpoints, your API key gives you access to the full DailyBot v1 API. Use these when you need to interact with DailyBot features directly:
+Beyond agent-specific endpoints, your API key gives you access to the full Dailybot v1 API. Use these when you need to interact with Dailybot features directly:
 
 | Endpoint | Purpose |
 |----------|---------|
@@ -605,10 +652,10 @@ Beyond agent-specific endpoints, your API key gives you access to the full Daily
 | Problem | Solution |
 |---------|----------|
 | `401 Unauthorized` | API key is invalid or expired. Re-authenticate: `dailybot login` or `dailybot config key=<new-key>`. If using HTTP, verify `DAILYBOT_API_KEY` is set correctly. |
-| `403 Forbidden` | API key doesn't have the required scope. Ask the human to check key permissions at DailyBot → Settings → API Keys. |
+| `403 Forbidden` | API key doesn't have the required scope. Ask the human to check key permissions at Dailybot → Settings → API Keys. |
 | `404 Not Found` | Check the endpoint URL. All agent endpoints are under `/v1/`. |
 | `429 Too Many Requests` | Rate limited. Slow down request frequency. Do not retry in a tight loop. |
 | CLI not found after install | Re-check with `command -v dailybot`. Try the pip fallback: `pip install dailybot-cli`. If still failing, use the HTTP API with `DAILYBOT_API_KEY`. |
 | "Not authenticated" | Run `dailybot status --auth` to check. Re-authenticate with `dailybot login` or `dailybot config key=<key>`. If session seems stale, run `dailybot logout` then `dailybot login`. |
-| Agent not appearing in DailyBot | Send at least one health check or report. DailyBot auto-registers agents on first contact. |
+| Agent not appearing in Dailybot | Send at least one health check or report. Dailybot auto-registers agents on first contact. |
 | Not receiving messages | Verify `agent_name` is consistent across all requests. Messages are delivered to the exact name match. |

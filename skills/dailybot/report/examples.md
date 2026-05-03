@@ -123,7 +123,7 @@ dailybot agent update \
   --name "cursor" \
   --milestone \
   --json-data '{"completed":["Preferences data model","REST API endpoints (CRUD)","Email channel integration","Slack channel integration","User settings UI","Test suite (32 cases)"],"in_progress":[],"blockers":[]}' \
-  --metadata '{"repo":"web-app","branch":"feature/notifications","agent_tool":"cursor","agent_name":"cursor","model":"claude-sonnet-4-20250514"}'
+  --metadata '{"repo":"my-web","branch":"feature/notifications","agent_tool":"cursor","agent_name":"cursor","model":"claude-sonnet-4-20250514"}'
 ```
 
 Why: Describes what users get, lists all deliverables, marks as milestone.
@@ -146,7 +146,7 @@ dailybot agent update \
   --name "codex" \
   --milestone \
   --json-data '{"completed":["JWT middleware implementation","Token validation service","Session migration script","Integration tests (24 cases)","API documentation update"],"in_progress":[],"blockers":[]}' \
-  --metadata '{"repo":"api-services","branch":"feature/auth","agent_tool":"codex","agent_name":"codex","model":"o3"}'
+  --metadata '{"repo":"my-api","branch":"feature/auth","agent_tool":"codex","agent_name":"codex","model":"o3"}'
 ```
 
 Why: Describes the outcome and lists specific deliverables. No plan names or task IDs.
@@ -167,7 +167,7 @@ dailybot agent update \
   "Implemented the staging deployment pipeline — builds and tests are automated, but the final deploy step is blocked by a Docker image issue." \
   --name "cursor" \
   --json-data '{"completed":["Build automation","Test runner integration","Environment configuration"],"in_progress":["Deploy step automation"],"blockers":["Docker base image missing libpq-dev — needs infrastructure team to update"]}' \
-  --metadata '{"repo":"api-services","branch":"feature/deploy","agent_tool":"cursor","agent_name":"cursor","model":"claude-sonnet-4-20250514"}'
+  --metadata '{"repo":"my-api","branch":"feature/deploy","agent_tool":"cursor","agent_name":"cursor","model":"claude-sonnet-4-20250514"}'
 ```
 
 Why: Clear about what's done, what's pending, and exactly what's blocking.
@@ -210,7 +210,7 @@ dailybot agent update \
   "Completed the API performance audit — identified 3 N+1 query issues and a missing database index that account for 80% of p95 latency. Documented findings with fix recommendations." \
   --name "copilot" \
   --json-data '{"completed":["Query analysis across 12 endpoints","N+1 detection and documentation","Missing index identification","Fix recommendation document"],"in_progress":[],"blockers":[]}' \
-  --metadata '{"repo":"api-services","branch":"main","agent_tool":"copilot","agent_name":"copilot","model":"gpt-4o"}'
+  --metadata '{"repo":"my-api","branch":"main","agent_tool":"copilot","agent_name":"copilot","model":"gpt-4o"}'
 ```
 
 Why: Specific findings, quantified impact, clear deliverables — even though no code was written.

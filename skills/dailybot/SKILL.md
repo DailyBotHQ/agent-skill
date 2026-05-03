@@ -1,7 +1,8 @@
 ---
 name: dailybot
 description: Dailybot skill pack — report progress, check messages, send emails, and announce agent status. Routes to the right sub-skill based on intent. Use when the developer mentions Dailybot or wants to interact with their team.
-homepage: https://api.dailybot.com/skill.md
+version: "1.0.0"
+documentation_url: https://api.dailybot.com/skill.md
 user-invocable: true
 metadata: {"openclaw":{"emoji":"📡","homepage":"https://dailybot.com","requires":{"anyBins":["dailybot","curl"]},"primaryEnv":"DAILYBOT_API_KEY","install":[{"id":"cli-install-script","kind":"download","url":"https://cli.dailybot.com/install.sh","label":"Install Dailybot CLI (official script — preferred on Linux/macOS)"},{"id":"pip","kind":"pip","package":"dailybot-cli","bins":["dailybot"],"label":"Install Dailybot CLI via pip (fallback if binary fails)"}]}}
 allowed-tools: Bash, Read, Grep, Glob
@@ -15,14 +16,15 @@ Dailybot connects AI coding agents to their human team. This is a skill pack wit
 
 ---
 
-## OpenClaw and `https://api.dailybot.com/skill.md`
+## `documentation_url` vs. the skill pack
 
-The `homepage` in frontmatter may point to `https://api.dailybot.com/skill.md`. That URL is the **public API reference** (HTTP endpoints and curl examples). It is **not** the GitHub skill pack (router, `shared/`, sub-skills, `setup.sh`).
+The `documentation_url` in frontmatter points to `https://api.dailybot.com/skill.md`. That URL is the **public API reference** (HTTP endpoints and curl examples). It is **not** the GitHub skill pack (router, `shared/`, sub-skills, `setup.sh`).
 
-- **OpenClaw:** Install the pack with `openclaw skills install dailybot`, or clone `https://github.com/DailyBotHQ/agent-skill` into `<workspace>/skills/dailybot/`.
+- **OpenClaw:** Install the pack with `openclaw skills install dailybot`, or clone `https://github.com/DailybotHQ/agent-skill` into `<workspace>/skills/dailybot/`.
+- **skills.sh / npx:** `npx skills add DailybotHQ/agent-skill` from any supported agent.
 - **Do not** treat downloading only `api.dailybot.com/skill.md` as a full install — agents need the complete repository or registry install.
 
-**Dailybot CLI:** Before any API call, ensure the CLI exists (`command -v dailybot`). If missing, **install it automatically** — do not wait for a separate “may I install?” step. Follow the order in [`shared/auth.md`](shared/auth.md): official install script first (best on most Linux/macOS), then pip, then HTTP fallback with `DAILYBOT_API_KEY` if the CLI cannot run.
+**Dailybot CLI:** Before any API call, ensure the CLI exists (`command -v dailybot`). If missing, follow the consent flow in [`shared/auth.md`](shared/auth.md) — the universal install script (`curl … install.sh` with SHA-256 verification) handles macOS / Linux / WSL / Docker / CI by auto-detecting the OS internally. Native Windows users get a PowerShell variant. `DAILYBOT_AUTO_YES=1` skips the interactive prompt for CI and power users. HTTP API with `DAILYBOT_API_KEY` is the last-resort fallback when no CLI can run.
 
 ---
 
@@ -66,6 +68,15 @@ All sub-skills reference these shared files for common operations:
 - [`shared/auth.md`](shared/auth.md) — authentication (CLI login, API key, agent registration, profile setup)
 - [`shared/context.sh`](shared/context.sh) — automated repo/branch/agent context detection
 - [`shared/http-fallback.md`](shared/http-fallback.md) — HTTP API patterns for when the CLI is unavailable
+
+---
+
+## Per-Repo Opt-Out
+
+Before any outbound call, sub-skills check for a `.dailybot/disabled` file in
+the working repository root. If present, the skill exits silently and no data
+leaves the machine. See `shared/context.sh` for the implementation and
+`README.md` for how developers turn this on.
 
 ---
 
