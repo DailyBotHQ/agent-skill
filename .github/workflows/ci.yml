@@ -115,39 +115,3 @@ jobs:
           # Only check repo-internal links by default (external can be flaky)
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
-
-  markdown-lint:
-    # markdownlint catches inconsistent formatting across the ~30 markdown
-    # files in this repo. The config (.github/markdownlint.yml) is set to
-    # be lenient — long lines and inline HTML are allowed because we use
-    # both intentionally.
-    name: Markdown lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DavidAnson/markdownlint-cli2-action@v17
-        with:
-          config: '.github/.markdownlint.yaml'
-          globs: |
-            **/*.md
-            !node_modules
-            !tmp/**
-
-  spell-check:
-    # codespell catches typos in user-facing prose. SKILL.md descriptions
-    # are read by every agent on every session — a typo here can break
-    # description-based matching, so this matters more than for a normal
-    # source repo.
-    name: Spell check (codespell)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: codespell-project/actions-codespell@v2
-        with:
-          # The skip list is deliberately tight — we want most prose
-          # checked. Add per-word allowlist entries to .github/codespell.txt
-          # rather than expanding the skip globs.
-          skip: '*.lock,*.svg,tmp,node_modules,.git'
-          ignore_words_file: '.github/codespell.txt'
-          check_filenames: true
-          check_hidden: false

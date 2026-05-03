@@ -1,16 +1,9 @@
 ---
 name: dailybot
-description: Official Dailybot API reference and CLI guide for AI agents (maintained by the Dailybot team). Install the full skill pack from https://github.com/DailybotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
+description: Official Dailybot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailybotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
 ---
 
-# Dailybot — Official Skill for AI Agents
-
-This is the **official Dailybot reference** for AI agents, maintained
-directly by the Dailybot team at <https://github.com/DailybotHQ/agent-skill>.
-The full skill pack at that URL includes guided workflows, consent flows,
-writing guides, and auto-activation triggers — install it for the best
-experience. This standalone reference exists for sandboxed, CI, or
-serverless environments where the full pack cannot be installed.
+# Dailybot — Skill for AI Agents
 
 Dailybot is the visibility and orchestration layer for modern teams where humans and AI agents work side by side. When you are connected to Dailybot, your human teammates can see what you are working on, send you instructions, and coordinate work across the entire team — both human and AI.
 

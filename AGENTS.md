@@ -39,15 +39,12 @@ the same instructions other agents do.
 
 ## Project Overview
 
-This repository is the **official, public Dailybot agent skill pack**,
-maintained by the team at [Dailybot](https://www.dailybot.com) and
-distributed via [skills.sh](https://skills.sh), [OpenClaw](https://www.openclaw.dev),
-and direct git clone. It is the canonical, first-party skill for
-connecting AI coding agents to Dailybot — third-party Dailybot skills
-exist on various registries but this is the one we own, support, and
-keep in sync with the API. It teaches AI coding agents how to talk to
-Dailybot: report progress to the team, check messages, send emails, and
-announce health status. The skill follows the
+This repository is the **official Dailybot agent skill pack**, maintained
+by [Dailybot](https://www.dailybot.com) and distributed via
+[skills.sh](https://skills.sh), [OpenClaw](https://www.openclaw.dev), and
+direct git clone. It teaches AI coding agents how to talk to Dailybot:
+report progress to the team, check messages, send emails, and announce
+health status. The skill follows the
 [Open Agent Skills](https://agentskills.io) standard.
 
 **Stack:** Bash + Markdown. No application runtime, no compiled artifacts.
@@ -223,14 +220,38 @@ migration note in `CHANGELOG.md`:
 - `DAILYBOT_API_KEY` env var
 - Skill `name` field in frontmatter (skills.sh registry references it)
 
-### 8. Update CHANGELOG.md when behavior changes
+### 8. Versioning is automatic — write good commits
 
-Any change a user could observe goes in `CHANGELOG.md` under the next
-version. CI fails if you change a `skills/dailybot/**/*.md` or
-`skills/dailybot/**/*.sh` file without bumping the changelog.
+You do **not** edit `version:` fields, `CHANGELOG.md`, or git tags by
+hand. The `auto-release.yml` workflow runs on every merge to `main` and:
 
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
-sections `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+1. Reads the current version from `skills/dailybot/SKILL.md` frontmatter.
+2. Looks at commits merged since the last `vX.Y.Z` tag.
+3. Decides the bump level:
+   - `feat(scope)!:` or `BREAKING CHANGE:` in body → **MAJOR**
+   - `feat(scope):` → **MINOR**
+   - everything else (`fix:`, `chore:`, no prefix, etc.) → **PATCH**
+4. Bumps the version in all 5 SKILL.md files, prepends a section to
+   `CHANGELOG.md`, commits as `chore(release): X.Y.Z [skip ci]`, tags
+   `vX.Y.Z`, and creates a GitHub Release.
+
+What this means for you:
+
+- Write meaningful commit messages with the right `<type>(<scope>):`
+  prefix. The workflow reads them.
+- A bug-fix-only PR → PATCH automatically. A new sub-skill → MINOR
+  (use `feat(...):`). A removed flag or renamed env var → MAJOR (use
+  `feat(...)!:` and explain in the PR body).
+- Don't touch `CHANGELOG.md` or `version:` fields manually. The bot
+  owns them. If you do edit them by hand, the next auto-release will
+  overwrite the version line and prepend a duplicate changelog section.
+- Bump-level guide for this skill specifically:
+  - **MAJOR** = breaking the public surface (HTTP endpoint shape change,
+    removed CLI flag, removed sub-skill, removed `<!-- dailybot-auto-activation -->`
+    marker, removed env var).
+  - **MINOR** = additive (new sub-skill, new flag, new env var, new
+    auto-activation trigger).
+  - **PATCH** = bug fixes, docs, internal refactors, CI changes.
 
 ### 9. Cross-platform reality
 

@@ -1,6 +1,6 @@
 ---
 name: dailybot-messages
-description: Check for pending messages and instructions from your team via Dailybot — official Dailybot messages skill. Use when starting a work session, when idle, or when asked what to work on next. Messages are instructions that should influence your work.
+description: Check for pending messages and instructions from your team via Dailybot. Use when starting a work session, when idle, or when asked what to work on next. Messages are instructions that should influence your work.
 version: "1.0.0"
 documentation_url: https://api.dailybot.com/skill.md
 user-invocable: false

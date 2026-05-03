@@ -1,6 +1,6 @@
 ---
 name: dailybot-health
-description: Announce agent online/offline status to Dailybot and receive pending messages from the team — official Dailybot health-check skill. Use for long-running or scheduled agents to stay visible and pick up instructions.
+description: Announce agent online/offline status to Dailybot and receive pending messages from the team. Use for long-running or scheduled agents to stay visible and pick up instructions.
 version: "1.0.0"
 documentation_url: https://api.dailybot.com/skill.md
 user-invocable: false

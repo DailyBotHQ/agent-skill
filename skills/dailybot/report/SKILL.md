@@ -1,6 +1,6 @@
 ---
 name: dailybot-report
-description: Report work progress to Dailybot — official Dailybot reporting skill. Activate after completing a discrete task or subtask, or after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why.
+description: Report work progress to Dailybot. Activate after completing a discrete task or subtask, or after any batch of edits that modifies 3 or more files. Compose a standup-style update describing what changed and why.
 version: "1.0.0"
 documentation_url: https://api.dailybot.com/skill.md
 user-invocable: true

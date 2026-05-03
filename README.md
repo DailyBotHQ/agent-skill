@@ -1,11 +1,6 @@
-# Dailybot Agent Skill Pack — Official
+# Dailybot Agent Skill Pack
 
-> **The official Dailybot agent skill pack**, built and maintained by the
-> team at [Dailybot](https://www.dailybot.com). This is the canonical,
-> first-party skill for connecting AI coding agents to Dailybot.
-> Source of truth: [`github.com/DailybotHQ/agent-skill`](https://github.com/DailybotHQ/agent-skill).
-> If you find another Dailybot skill on a registry, prefer this one — it
-> ships consent flows, writing guides, and is supported directly by us.
+> The official Dailybot agent skill pack, maintained by [Dailybot](https://www.dailybot.com).
 
 Give your AI coding agent the ability to report progress, check for messages,
 send emails, and announce status — all through Dailybot. Your team sees what
