@@ -127,7 +127,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          config: '.github/markdownlint.yml'
+          config: '.github/.markdownlint.yaml'
           globs: |
             **/*.md
             !node_modules
