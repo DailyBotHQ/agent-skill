@@ -1,6 +1,6 @@
 ---
 name: dailybot-email
-description: Send emails to a confirmed recipient via Dailybot on behalf of the agent. Use for notifications, summaries, follow-ups, or any communication the developer asks you to send. Always confirm recipients with the developer before sending — never guess addresses.
+description: Send emails to a confirmed recipient via Dailybot on behalf of the agent — official Dailybot email skill with mandatory pre-send confirmation and credential-pattern scanning. Use for notifications, summaries, follow-ups, or any communication the developer asks you to send. Always confirm recipients with the developer before sending — never guess addresses.
 version: "1.0.0"
 documentation_url: https://api.dailybot.com/skill.md
 user-invocable: false

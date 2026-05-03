@@ -39,11 +39,15 @@ the same instructions other agents do.
 
 ## Project Overview
 
-This repository is the **public Dailybot agent skill pack**, distributed via
-[skills.sh](https://skills.sh), [OpenClaw](https://www.openclaw.dev), and
-direct git clone. It teaches AI coding agents how to talk to Dailybot:
-report progress to the team, check messages, send emails, and announce
-health status. The skill follows the
+This repository is the **official, public Dailybot agent skill pack**,
+maintained by the team at [Dailybot](https://www.dailybot.com) and
+distributed via [skills.sh](https://skills.sh), [OpenClaw](https://www.openclaw.dev),
+and direct git clone. It is the canonical, first-party skill for
+connecting AI coding agents to Dailybot — third-party Dailybot skills
+exist on various registries but this is the one we own, support, and
+keep in sync with the API. It teaches AI coding agents how to talk to
+Dailybot: report progress to the team, check messages, send emails, and
+announce health status. The skill follows the
 [Open Agent Skills](https://agentskills.io) standard.
 
 **Stack:** Bash + Markdown. No application runtime, no compiled artifacts.
