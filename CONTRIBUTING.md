@@ -409,11 +409,12 @@ Dailybot security team directly.
 | Every convention and rule (canonical, terse) | [`AGENTS.md`](AGENTS.md) |
 | Why the layout / consent flows / etc. are the way they are | [`docs/DESIGN.md`](docs/DESIGN.md) |
 | How to add a new sub-skill in detail | [`docs/SUB_SKILL_GUIDE.md`](docs/SUB_SKILL_GUIDE.md) |
+| The full install guide (6 methods, compare/update/uninstall) | [`docs/INSTALLATION.md`](docs/INSTALLATION.md) |
 | The public CLI / HTTP API the skill calls | [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) |
 | OpenClaw-specific install notes | [`docs/OPENCLAW.md`](docs/OPENCLAW.md) |
 | Per-version release notes | [`CHANGELOG.md`](CHANGELOG.md) |
 | Security disclosure | [`SECURITY.md`](SECURITY.md) |
-| User-facing install / usage | [`README.md`](README.md) |
+| User-facing install / usage (quickstart) | [`README.md`](README.md) |
 
 ---
 
