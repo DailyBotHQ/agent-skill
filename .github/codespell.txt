@@ -1,0 +1,4 @@
+# Words codespell should NOT flag as typos.
+# Each line is a literal word; comments start with '#'.
+# Keep this list minimal — prefer fixing actual prose over adding
+# allowlist entries.

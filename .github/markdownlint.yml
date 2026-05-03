@@ -1,0 +1,17 @@
+# markdownlint-cli2 config — intentionally lenient so we don't fight the
+# linter over decisions we made on purpose (long prose lines, inline HTML
+# in admonitions, GitHub-flavored callouts).
+# Full rule reference: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Disable rules we explicitly don't enforce
+MD013: false  # line-length — we wrap by sentence/clause, not column
+MD024: false  # multiple headings with the same content — common in CHANGELOG sections
+MD033: false  # inline HTML — we use <details>, <summary>, GitHub callouts
+MD034: false  # bare URLs — we use them in code spans and reference sections
+MD036: false  # emphasis used instead of heading — fine in nested admonitions
+MD041: false  # first line in file should be a heading — frontmatter is fine
+MD046: false  # code block style — we mix fenced and indented when convenient
+
+# Keep the rest of the rules at default settings.
+
+default: true

@@ -1,0 +1,132 @@
+name: CDN monitor
+
+# Runs `scripts/verify-cdn.sh` against the live `cli.dailybot.com` CDN.
+# This complements the in-repo `verify-cdn.sh` (which a contributor runs
+# locally) by catching CDN drift even when no PR triggers it: e.g. if
+# `DailybotHQ/cli` ever pushes an `install.sh` change without regenerating
+# the matching `.sha256`, the skill's verified install path breaks
+# silently for users. This job notices within ~24h.
+#
+# The job is allowed to fail without blocking anything — it only opens an
+# issue (when one isn't already open) and notifies via the workflow run.
+# Triggers:
+#   - daily on a cron schedule
+#   - manually from the Actions tab via workflow_dispatch
+#   - on push to `main` (so a fresh merge re-checks immediately)
+
+on:
+  schedule:
+    # 06:00 UTC daily (early morning EU, late night Americas).
+    # Times to avoid: top of the hour (GitHub-wide load) and 00:00 UTC.
+    - cron: '17 6 * * *'
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/verify-cdn.sh'
+      - 'skills/dailybot/shared/auth.md'
+      - '.github/workflows/cdn-monitor.yml'
+
+permissions:
+  contents: read
+  issues: write   # needed to open an issue if the CDN is broken
+
+jobs:
+  probe:
+    name: Probe cli.dailybot.com installer URLs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run verify-cdn.sh
+        id: verify
+        run: |
+          # Capture both stdout and stderr; let the script's own exit code
+          # decide pass/fail.
+          set +e
+          OUTPUT=$(bash scripts/verify-cdn.sh 2>&1)
+          STATUS=$?
+          set -e
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo "$OUTPUT"
+          # Persist the output in step summary so it's visible without
+          # opening the raw log.
+          {
+            echo "## verify-cdn.sh output"
+            echo ""
+            echo '```'
+            echo "$OUTPUT"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          # Make the output available to later steps.
+          {
+            echo 'output<<EOF'
+            echo "$OUTPUT"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+          exit $STATUS
+
+      - name: Open or update tracking issue on failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'CDN monitor: cli.dailybot.com installer drifted from skill expectations';
+            const output = `${{ steps.verify.outputs.output }}`;
+
+            // Look for an existing open issue with this title — don't open
+            // a new one every day.
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['cdn-monitor'],
+            });
+            const open = existing.data.find(i => i.title === title);
+
+            const body = [
+              "The scheduled CDN monitor run failed. The skill's verified install",
+              "flow (documented in `skills/dailybot/shared/auth.md`) requires that",
+              "`cli.dailybot.com/install.sh.sha256` (and optionally `install.ps1.sha256`)",
+              "be reachable AND match the served installer.",
+              "",
+              "## verify-cdn.sh output",
+              "",
+              '```',
+              output,
+              '```',
+              "",
+              "## Likely causes",
+              "",
+              "1. `DailybotHQ/cli` updated `install.sh` but the auto-checksum workflow",
+              "   (`sync-installer-checksums.yml`) didn't run or failed.",
+              "2. Cloudflare cache hasn't propagated yet (transient).",
+              "3. Cloudflare wildcard rule for `cli.dailybot.com/*` was changed.",
+              "",
+              "## What to do",
+              "",
+              "1. Run `bash scripts/verify-cdn.sh` locally to confirm.",
+              "2. If still failing, check the latest commit on `DailybotHQ/cli@main`",
+              "   and look at the `sync-installer-checksums.yml` run.",
+              "3. If the checksum is genuinely out of sync, regenerate and push:",
+              "   `shasum -a 256 install.sh > install.sh.sha256` (in the cli repo).",
+              "",
+              `Detected by run: ${context.runId}`,
+            ].join('\n');
+
+            if (open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.number,
+                body: `Re-detected on ${new Date().toISOString()}\n\n${body}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['cdn-monitor', 'bug'],
+              });
+            }
