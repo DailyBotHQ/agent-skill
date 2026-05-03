@@ -31,7 +31,7 @@ The following are in scope for security reports:
 
 The following are tracked separately and not handled here:
 
-- The `dailybot` CLI itself (report at <https://github.com/DailybotHQ/dailybot-cli>)
+- The `dailybot` CLI itself (report at <https://github.com/DailybotHQ/cli>)
 - The Dailybot API (`api.dailybot.com`) — report via the email above
 - Third-party agent harnesses (Claude Code, Cursor, etc.) — report upstream
 - Issues caused by user-modified copies of the skill that drift from this repo
