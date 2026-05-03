@@ -4,6 +4,19 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Allow re-running the gate manually from the Actions tab if needed.
+  workflow_dispatch: {}
+
+# Cancel old runs of the same branch / PR when a new push lands. Saves CI
+# minutes and keeps the most recent commit's status as the source of truth.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Default to read-only on the GitHub token. Individual jobs that need more
+# (writes, packages, releases) opt in explicitly.
+permissions:
+  contents: read
 
 jobs:
   shellcheck:

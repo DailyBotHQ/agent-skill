@@ -1,5 +1,10 @@
 # Security Policy
 
+This is the **official Dailybot agent skill pack**, maintained by the team at
+[Dailybot](https://www.dailybot.com). Source of truth:
+<https://github.com/DailybotHQ/agent-skill>. Reports against this repo
+reach the Dailybot security team directly.
+
 ## Reporting a Vulnerability
 
 If you believe you have found a security vulnerability in the Dailybot agent

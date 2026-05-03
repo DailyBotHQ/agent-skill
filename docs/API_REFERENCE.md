@@ -1,6 +1,6 @@
 ---
 name: dailybot
-description: Dailybot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailybotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
+description: Official Dailybot API reference and CLI guide for AI agents. Install the full skill pack from https://github.com/DailybotHQ/agent-skill for guided workflows, or use this file standalone for CLI and HTTP operations.
 ---
 
 # Dailybot — Skill for AI Agents

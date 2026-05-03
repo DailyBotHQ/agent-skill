@@ -1,6 +1,6 @@
 ---
 name: dailybot
-description: Dailybot skill pack — report progress, check messages, send emails, and announce agent status. Routes to the right sub-skill based on intent. Use when the developer mentions Dailybot or wants to interact with their team.
+description: Official Dailybot agent skill pack — report progress, check messages, send emails, and announce agent status. Routes to the right sub-skill based on intent. Use when the developer mentions Dailybot or wants to interact with their team.
 version: "1.0.0"
 documentation_url: https://api.dailybot.com/skill.md
 user-invocable: true
