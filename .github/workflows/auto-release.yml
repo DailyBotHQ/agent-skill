@@ -39,7 +39,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Falls back to GITHUB_TOKEN if RELEASE_TOKEN is not set, but the
+          # default GITHUB_TOKEN cannot push to a protected `main` unless
+          # `github-actions[bot]` is in the branch-protection bypass list.
+          # Recommended: set `RELEASE_TOKEN` to a PAT that has `Contents:
+          # write` on this repo and is in the bypass list (or use a fine-
+          # grained token for a bot user like `dailybotops`).
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Set up git identity
         run: |
