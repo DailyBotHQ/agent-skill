@@ -69,3 +69,8 @@ tmp/*
 
 # Accidentally created skill runtime markers during local testing
 /.dailybot/
+
+
+# VS Code workspace settings (personal, don't track)
+.vscode/
+.vscode_*/
