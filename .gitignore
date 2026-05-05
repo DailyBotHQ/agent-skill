@@ -69,3 +69,12 @@ tmp/*
 
 # Accidentally created skill runtime markers during local testing
 /.dailybot/
+
+
+# VS Code workspace settings: personal `.vscode/` (and `.vscode_*` variants
+# contributors might create) stay out of the repo, but `.vscode_example/` is
+# tracked as a shared template — contributors copy it to `.vscode/` if they
+# want the Dailybot recommended workspace setup.
+.vscode/
+.vscode_*/
+!.vscode_example/
