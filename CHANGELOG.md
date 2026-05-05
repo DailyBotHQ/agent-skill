@@ -4,6 +4,19 @@ All notable changes to the Dailybot agent skill pack are documented in this
 file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-05-05
+
+### Changes
+
+- Merge pull request #6 from DailybotHQ/security/audit-response
+- Adding vscode example
+- feat(security): explicit trust model for incoming user-generated content (W011)
+- feat(security): defense-in-depth verified install resolves W012 without losing curl|bash UX
+- chore: track .vscode_example/ as a shared workspace-settings template
+- chore: gitignore VS Code workspace settings (.vscode/ and .vscode_*)
+- docs(skill): polish the router SKILL.md to read well on the skills.sh listing
+
+
 ## [1.1.2] — 2026-05-03
 
 ### Changes
