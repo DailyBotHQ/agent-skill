@@ -43,16 +43,19 @@ treat that as session-wide consent.
 > If the developer is on Windows but has WSL2 or Git Bash, prefer
 > `install.sh` — it has broader testing coverage.
 
-#### Primary path: SHA-256-verified script (Linux, macOS, WSL2, Git Bash, Docker, CI)
+#### Primary path: defense-in-depth verified install (Linux, macOS, WSL2, Git Bash, Docker, CI)
 
 Show the developer this prompt the first time:
 
 > "I'd like to install the Dailybot CLI. The command I'll run is:
 >
 > ```bash
-> curl -fsSL https://cli.dailybot.com/install.sh        -o /tmp/install.sh
+> curl -fsSL https://cli.dailybot.com/install.sh                              -o /tmp/install.sh
+> curl -fsSL https://raw.githubusercontent.com/DailybotHQ/cli/main/install.sh -o /tmp/install.sh.gh
+> diff -q /tmp/install.sh /tmp/install.sh.gh || { echo "Install script on Cloudflare CDN does not match the GitHub source — refusing to install." >&2; exit 1; }
 > curl -fsSL https://cli.dailybot.com/install.sh.sha256 -o /tmp/install.sh.sha256
-> ( cd /tmp && shasum -a 256 -c install.sh.sha256 ) && bash /tmp/install.sh
+> ( cd /tmp && shasum -a 256 -c install.sh.sha256 ) || exit 1
+> bash /tmp/install.sh
 > ```
 >
 > The script auto-detects your OS and uses Homebrew on macOS, the prebuilt
@@ -60,18 +63,50 @@ Show the developer this prompt the first time:
 > the CLI itself owns those workflows (`dailybot upgrade`). **Should I
 > proceed?** (yes / no)"
 
-On confirmation, run the three commands. If the SHA-256 check fails, **abort**
-and warn the developer — do not run the script. The
-`sync-installer-checksums.yml` workflow on `DailybotHQ/cli` keeps
-`install.sh` and `install.sh.sha256` in lockstep, so a mismatch in the
-verified path indicates either a stale Cloudflare cache, a CDN compromise,
-or a man-in-the-middle situation — never a normal first-day experience.
+The flow has **three independent integrity checks** before the script
+executes — any one of them aborts the install:
 
-If `https://cli.dailybot.com/install.sh.sha256` returns a non-200 (rare —
-implies a CDN problem at Cloudflare, not a deploy state on our side), warn
-the developer and offer two choices: (a) run the unverified script anyway
-with their explicit additional consent, or (b) skip CLI install and use
-the HTTP API path below.
+1. **Cross-origin diff.** The script is fetched twice — once from
+   `cli.dailybot.com` (Cloudflare CDN) and once from
+   `raw.githubusercontent.com/DailybotHQ/cli/main/install.sh` (GitHub's
+   public-source endpoint). They must be byte-identical. A coordinated
+   compromise that flips both Cloudflare AND GitHub's raw output for the
+   same file would be required to defeat this; either alone is caught.
+2. **SHA-256 sidecar match.** The `.sha256` companion file (also served
+   by `cli.dailybot.com`, regenerated on every CLI release by
+   `sync-installer-checksums.yml`) must match the script's actual hash.
+   This catches CDN cache corruption and stale-deploy scenarios.
+3. **(Optional) Cosign signature verification.** If `cosign` is on PATH
+   AND the CLI repo has published `install.sh.sig` + `install.sh.cert`
+   (signed by `DailybotHQ/cli` GitHub Actions OIDC, recorded in the
+   public Sigstore transparency log), the agent should also run:
+   ```bash
+   if command -v cosign >/dev/null 2>&1 && curl -fsI https://cli.dailybot.com/install.sh.sig >/dev/null 2>&1; then
+     curl -fsSL https://cli.dailybot.com/install.sh.sig  -o /tmp/install.sh.sig
+     curl -fsSL https://cli.dailybot.com/install.sh.cert -o /tmp/install.sh.cert
+     cosign verify-blob \
+       --certificate-identity-regexp 'https://github.com/DailybotHQ/cli/.*' \
+       --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
+       --signature /tmp/install.sh.sig \
+       --certificate /tmp/install.sh.cert \
+       /tmp/install.sh || exit 1
+   fi
+   ```
+   This binds the script to GitHub's OIDC identity, anchored in the
+   transparency log. Until the CLI repo publishes `.sig`/`.cert` files
+   the step is a no-op (the `curl -fsI` probe falls through), so the
+   agent never errors on it being absent.
+
+If any check fails, **abort** and warn the developer — never fall back
+silently. If `install.sh.sha256` itself returns non-200 (rare CDN
+incident), warn the developer and offer two choices: (a) re-fetch later,
+or (b) skip CLI install and use the HTTP API path below. Do not run the
+script unverified.
+
+> **Threat-model rationale and operational controls** (HSTS preload,
+> Certificate Transparency monitoring, the public Sigstore log) are
+> documented in [`SECURITY.md`](../../../SECURITY.md) under
+> *"Supply-chain integrity for the CLI installer"*.
 
 #### Native Windows PowerShell (only when WSL2 / Git Bash unavailable)
 
